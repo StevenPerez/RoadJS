@@ -50,11 +50,13 @@ var road = function road()
 		
 	return {
 		
-		add: function add(obj, fun) {
+		// Memory Methods
+		add: function add(obj, fun, status) {
 			try {
 				// Initialize
 				fun = fun || {};
 				fun.send_back = fun.send_back || false;
+				status = status || 'new';
 				
 				var length = 0;
 				// If the object was passed
@@ -71,19 +73,28 @@ var road = function road()
 					for (var i = 0; i < length; i++)
 					{
 						obj[i].cid 		= genID() + i.toString(); // Avoid duplicity adding the counter
-						obj[i].status 	= 'new';
+						obj[i].status 	= status;
+						
+						// Clone Extended Object
+						var copiedObject = {};
+						$.extend(copiedObject, obj[i]);
 						
 						// Add the Object
-						data.push(obj[i]);	
+						data.push(copiedObject);
 					}
 				}
 				else
 				// If it is just one Object
 				{
 					obj.cid 		= genID() + idCounter.toString();
-					obj.status 		= 'new';
-						
-					data.push(obj);
+					obj.status 		= status;
+
+					// Clone Extended Object
+					var copiedObject = {};
+					$.extend(copiedObject, obj);
+					
+					// Add the Object
+					data.push(copiedObject);
 					
 					idCounter++;
 					idCounter = (idCounter > 99) ? 0 : idCounter;
@@ -130,10 +141,11 @@ var road = function road()
 				// If an object was found
 				if (removeIndex >= 0) 
 				{
-					// Store the removed item but as a new item
+					// Clone Extended Object
 					var copiedObject = {};
 					$.extend(copiedObject, this.getByCID(cid));
-					// Add Copied Object in dataRemoved
+					
+					// Add the Clone to dataRemoved
 					dataRemoved.push(copiedObject);
 					
 					// Remove the Item
@@ -348,6 +360,36 @@ var road = function road()
 				return data.length;
 			}
 			catch (err)
+			{ throw err; }
+		},
+		
+		// Ajax Requests
+		load: function load(ajaxParams) {
+			try {
+				// Validate there are params
+				if (!ajaxParams)
+					throw 'Missing ajax parameters';
+				
+				// Set not async load
+				ajaxParams.async = false;
+				
+				// Initialize Data
+				data = [];
+				
+				// Send Ajax Request
+				var dataAnalysis = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				if (typeof(dataAnalysis) == 'string')
+					dataAnalysis = JSON.parse(dataAnalysis);
+				
+				// If there is data then Add to data
+				if (dataAnalysis) {	
+					this.add(dataAnalysis, {}, 'origin');
+				}
+
+			}
+			catch(err)
 			{ throw err; }
 		}
 		

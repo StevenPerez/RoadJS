@@ -1,7 +1,8 @@
 var road = function road()
 {
-	var data = [];		// Object container of the information
-	var idCounter = 0;	// Avoid CID duplicates
+	var data = [];				// Object container of the information
+	var dataRemoved = [];		// Object container of the information
+	var idCounter = 0;			// Avoid CID duplicates
 	
 	// Generate Cache ID at the moment to Add or Set new data
 	function genID()	
@@ -46,7 +47,7 @@ var road = function road()
 		{ throw err; }
 			
 	}
-	
+		
 	return {
 		
 		add: function add(obj, fun) {
@@ -110,16 +111,34 @@ var road = function road()
 		remove: function remove(cid) {
 			try
 			{
+				// Check if a cid was passed
+				if (cid)
+				{
+					if (typeof(cid) == 'number')
+						throw 'cid value should be String';
+				}
+				else
+					throw 'Missing cid';
+				
 				// Check if a cid was not passed
-				if (!cid || this.length() == 0)
-					throw 'Missing cid or No data in memory';
+				if (this.length() == 0)
+					throw 'No data in memory';
 				
 				// Get the index of the item to delete
 				var removeIndex = data.map(function(data) { return data.cid; }).indexOf(cid);
 				
 				// If an object was found
 				if (removeIndex >= 0) 
+				{
+					// Store the removed item but as a new item
+					var copiedObject = {};
+					$.extend(copiedObject, this.getByCID(cid));
+					// Add Copied Object in dataRemoved
+					dataRemoved.push(copiedObject);
+					
+					// Remove the Item
 					data.splice(removeIndex, 1);
+				}
 				else
 					return null;
 			}
@@ -127,7 +146,7 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		update: function update(obj, cid, fun) {
+		update: function update(obj, cid) {
 			try {
 				// Validations
 				if (!obj)
@@ -195,7 +214,27 @@ var road = function road()
 			catch (err)
 			{ throw err; }
 		},
-				
+		
+		delete: function del(cid) {
+			try {
+				if (!cid)
+					throw 'Missing cid';
+
+				// Get the object from Data by cid
+				var objData = this.getByCID(cid.toString(), false);
+
+				// Validate if item was found
+				if (objData == undefined)
+					throw 'No item found for cid ' + cid.toString();
+
+				// Change Status and reinforce the cid item
+				objData.cid = cid.toString();
+				objData.status = 'deleted';
+			}
+			catch (err)
+			{ throw err; }
+			},
+		
 		setData: function setData(newData) {
 			try
 			{
@@ -214,6 +253,14 @@ var road = function road()
 			{ throw err; }
 		},
 		
+		getAllRemoved: function getAllRemoved() {
+			try {
+				return dataRemoved;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
 		getByCID: function getByCID(cid, isClone) {
 			try
 			{	
@@ -221,8 +268,13 @@ var road = function road()
 				// returned object
 				if (isClone == undefined) { isClone = true; }
 				
-				// Validate cid
-				if (!cid)
+				// Check if a cid was passed
+				if (cid)
+				{
+					if (typeof(cid) == 'number')
+						throw 'cid value should be String';
+				}
+				else
 					throw 'Missing cid';
 				
 				// If it is necessary to return a new object
@@ -250,6 +302,47 @@ var road = function road()
 			catch(err) { return err; }
 		},
 		
+		getRemovedByCID: function getRemovedByCID(cid, isClone) {
+			try
+			{	
+				// If it is undefined then create a Clone of the
+				// returned object
+				if (isClone == undefined) { isClone = true; }
+				
+				// Check if a cid was passed
+				if (cid)
+				{
+					if (typeof(cid) == 'number')
+						throw 'cid value should be String';
+				}
+				else
+					throw 'Missing cid';
+				
+				// If it is necessary to return a new object
+				if (isClone)
+				{
+					return Object.create(Enumerable.From(dataRemoved).Where(
+													function (x) { 
+														return x.cid.toString() == cid.toString() 
+													})
+											.Select()
+											.ToArray()[0]);
+				}
+				else
+				// If not, return the object linked
+				{
+					return Enumerable.From(dataRemoved).Where(
+													function (x) { 
+														return x.cid.toString() == cid.toString() 
+													})
+											.Select()
+											.ToArray()[0];
+				}
+				
+			}
+			catch(err) { return err; }
+		},
+		
 		length: function length() {
 			try {
 				return data.length;
@@ -261,8 +354,3 @@ var road = function road()
 	};
 	
 };
-
-var a = road();
-a.add({ name: 'Steven', age: 20});
-a.add({ name: 'Mochi', age: 21});
-a.add({ name: 'Marta', age: 22});

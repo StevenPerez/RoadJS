@@ -47,10 +47,23 @@ var road = function road()
 		{ throw err; }
 			
 	}
+	
+	function validateCID(cid) {
+		// Check if a cid was passed
+		if (cid)
+		{
+			if (typeof(cid) == 'number')
+				throw 'cid value should be String';
+		}
+		else
+			throw 'Missing cid';
+	}
 		
 	return {
 		
-		// Memory Methods
+		// 						>>> Memory Methods <<<
+		
+		// Not Removed Items
 		add: function add(obj, fun, status) {
 			try {
 				// Initialize
@@ -123,13 +136,7 @@ var road = function road()
 			try
 			{
 				// Check if a cid was passed
-				if (cid)
-				{
-					if (typeof(cid) == 'number')
-						throw 'cid value should be String';
-				}
-				else
-					throw 'Missing cid';
+				validateCID(cid);
 				
 				// Check if a cid was not passed
 				if (this.length() == 0)
@@ -205,7 +212,7 @@ var road = function road()
 						throw 'Missing cid';
 				
 					if (!cid && obj.cid)
-						cid = cid.toString() || obj.cid.toString();
+						cid = cid || obj.cid;
 					
 					// Get the object from Data by cid
 					var objData = this.getByCID(cid.toString(), false);
@@ -229,8 +236,8 @@ var road = function road()
 		
 		delete: function del(cid) {
 			try {
-				if (!cid)
-					throw 'Missing cid';
+				
+				validateCID(cid);
 
 				// Get the object from Data by cid
 				var objData = this.getByCID(cid.toString(), false);
@@ -265,14 +272,6 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		getAllRemoved: function getAllRemoved() {
-			try {
-				return dataRemoved;
-			}
-			catch (err)
-			{ throw err; }
-		},
-		
 		getByCID: function getByCID(cid, isClone) {
 			try
 			{	
@@ -281,13 +280,7 @@ var road = function road()
 				if (isClone == undefined) { isClone = true; }
 				
 				// Check if a cid was passed
-				if (cid)
-				{
-					if (typeof(cid) == 'number')
-						throw 'cid value should be String';
-				}
-				else
-					throw 'Missing cid';
+				validateCID(cid);
 				
 				// If it is necessary to return a new object
 				if (isClone)
@@ -313,6 +306,76 @@ var road = function road()
 			}
 			catch(err) { return err; }
 		},
+
+		getByStatus: function getByStatus(status, isClone) {
+			try
+			{	
+				// If it is undefined then create a Clone of the
+				// returned object
+				if (isClone == undefined) { isClone = true; }
+				
+				// Check if a status was passed
+				if (!status)
+					throw 'Missing status';
+				
+				// Search Item by Status
+				var arrData = Enumerable.From(data).Where(
+												function (x) { 
+													return x.status == status
+												})
+										.Select()
+										.ToArray();
+
+				// If no items were found
+				if (!arrData)
+					return [];
+
+				// Prepare Array to Return
+				var arrToReturn = [];
+				
+				// Loop and add the properties to each Object
+				for (var i = 0; i < arrData.length; i++)
+				{
+
+					// If it is necessary to return a new object
+					if (isClone)
+					{
+						// Clone Extended Object
+						var copiedObject = {};
+						$.extend(copiedObject, arrData[i]);
+
+						// Add the Object
+						arrToReturn.push(copiedObject);
+					}
+					else
+					{
+						// Add the Object linked
+						arrToReturn.push(arrData[i]);
+					}
+				}
+
+				return arrToReturn;
+
+			}
+			catch(err) { return err; }
+		},
+		
+		length: function length() {
+			try {
+				return data.length;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		// Removed Items
+		getAllRemoved: function getAllRemoved() {
+			try {
+				return dataRemoved;
+			}
+			catch (err)
+			{ throw err; }
+		},
 		
 		getRemovedByCID: function getRemovedByCID(cid, isClone) {
 			try
@@ -322,13 +385,7 @@ var road = function road()
 				if (isClone == undefined) { isClone = true; }
 				
 				// Check if a cid was passed
-				if (cid)
-				{
-					if (typeof(cid) == 'number')
-						throw 'cid value should be String';
-				}
-				else
-					throw 'Missing cid';
+				validateCID(cid);
 				
 				// If it is necessary to return a new object
 				if (isClone)
@@ -355,15 +412,151 @@ var road = function road()
 			catch(err) { return err; }
 		},
 		
-		length: function length() {
+		cleanRemoved: function cleanRemoved() {
 			try {
-				return data.length;
+				dataRemoved = [];
 			}
 			catch (err)
 			{ throw err; }
 		},
 		
+		lengthRemoved: function length() {
+			try {
+				return dataRemoved.length;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		destroyRemovedByCID: function destroyRemovedByCID(cid) {
+			try
+			{
+				// Check if a cid was passed
+				validateCID(cid);
+				
+				// Check if a cid was not passed
+				if (this.lengthRemoved() == 0)
+					throw 'No data in memory';
+				
+				// Get the index of the item to delete
+				var removeIndex = dataRemoved.map(function(dataRemoved) { return dataRemoved.cid; }).indexOf(cid);
+				
+				// If an object was found
+				if (removeIndex >= 0) 
+				{	
+					// Remove the Item
+					dataRemoved.splice(removeIndex, 1);
+				}
+				else
+					return null;
+			}
+			catch(err)
+			{ throw err; }
+		},
+		
+		recoverRemovedByCID: function recoverRemovedByCID(cid) {
+			try {
+				
+				// Check if a cid was passed
+				validateCID(cid);
+				
+				// Check if a cid was not passed
+				if (this.lengthRemoved() == 0)
+					throw 'No data in memory';
+				
+				// Get the item to recover from the removed list
+				var objRecover = this.getRemovedByCID(cid);
+				
+				// Check if the item was found
+				if (!objRecover)
+					throw 'No item found for cid ' + cid.toString();
+				
+				// Create a new object
+				var objNew = {};
+				$.extend(objNew, objRecover);
+				
+				// Add the item to the Non removed list
+				this.add(objNew);
+				
+				// Remove item from the Removed list
+				this.destroyRemovedByCID(cid);
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		recoverAllRemoved: function recoverAllRemoved() {
+			try {
+				
+				// Check if a cid was not passed
+				if (this.lengthRemoved() == 0)
+					throw 'No data in memory';
+				
+				// Add the entire removed list to the Non removed list
+				this.add(this.getAllRemoved());
+				
+				// Clean the Removed list
+				this.cleanRemoved();
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		getRemovedByStatus: function getRemovedByStatus(status, isClone) {
+			try
+			{	
+				// If it is undefined then create a Clone of the
+				// returned object
+				if (isClone == undefined) { isClone = true; }
+				
+				// Check if a status was passed
+				if (!status)
+					throw 'Missing status';
+				
+				// Search Item by Status
+				var arrData = Enumerable.From(dataRemoved).Where(
+												function (x) { 
+													return x.status == status
+												})
+										.Select()
+										.ToArray();
+
+				// If no items were found
+				if (!arrData)
+					return [];
+
+				// Prepare Array to Return
+				var arrToReturn = [];
+				
+				// Loop and add the properties to each Object
+				for (var i = 0; i < arrData.length; i++)
+				{
+
+					// If it is necessary to return a new object
+					if (isClone)
+					{
+						// Clone Extended Object
+						var copiedObject = {};
+						$.extend(copiedObject, arrData[i]);
+
+						// Add the Object
+						arrToReturn.push(copiedObject);
+					}
+					else
+					{
+						// Add the Object linked
+						arrToReturn.push(arrData[i]);
+					}
+				}
+
+				return arrToReturn;
+
+			}
+			catch(err) { return err; }
+		},
+		
 		// Ajax Requests
+		
 		load: function load(ajaxParams) {
 			try {
 				// Validate there are params
@@ -390,6 +583,20 @@ var road = function road()
 
 			}
 			catch(err)
+			{ throw err; }
+		},
+		
+		sendByCID: function sendByCID(cid, ajaxParams) {
+			try {
+				
+				// Check if a cid was passed
+				validateCID(cid);
+				
+				// Validate there are params
+				if (!ajaxParams)
+					throw 'Missing ajax parameters';
+			}
+			catch (err)
 			{ throw err; }
 		}
 		

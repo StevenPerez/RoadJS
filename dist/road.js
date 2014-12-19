@@ -59,7 +59,7 @@ var road = function road()
 		else
 			throw 'Missing cid';
 	}
-	
+		
 	return {
 		
 		// 						>>> Memory Methods <<<
@@ -67,6 +67,7 @@ var road = function road()
 		// >> Not Removed Items
 		add: function add(obj, fun, status) {
 			try {
+				
 				// Initialize
 				fun = fun || {};
 				fun.send_back = fun.send_back || false;
@@ -88,7 +89,7 @@ var road = function road()
 					{
 						obj[i].cid 		= genID() + i.toString(); // Avoid duplicity adding the counter
 						obj[i].status 	= status;
-						
+												
 						// Clone Extended Object
 						var copiedObject = {};
 						$.extend(copiedObject, obj[i]);
@@ -99,16 +100,17 @@ var road = function road()
 				}
 				else
 				// If it is just one Object
-				{
+				{					
 					obj.cid 		= genID() + idCounter.toString();
 					obj.status 		= status;
-
+										
 					// Clone Extended Object
 					var copiedObject = {};
 					$.extend(copiedObject, obj);
-					
+
 					// Add the Object
 					data.push(copiedObject);
+					
 					
 					idCounter++;
 					idCounter = (idCounter > 99) ? 0 : idCounter;
@@ -132,7 +134,7 @@ var road = function road()
 				throw err; 
 			}
 		},
-		
+				
 		remove: function remove(cid) {
 			try
 			{
@@ -492,10 +494,10 @@ var road = function road()
 				// Check if a cid was not passed
 				if (this.lengthRemoved() == 0)
 					throw 'No data in memory';
-				
-				// Add the entire removed list to the Non removed list
-				this.add(this.getAllRemoved());
-				
+
+				for (var i = 0; i < this.lengthRemoved(); i++)
+					this.add(dataRemoved[i]);
+
 				// Clean the Removed list
 				this.cleanRemoved();
 			}
@@ -658,8 +660,26 @@ var road = function road()
 			}
 			catch (err)
 			{ throw err; }
-		}
+		},
 		
 	};
 	
 };
+
+var a = road();
+
+a.add({ name: 'Steven', age: 20 });
+a.add({ name: 'Mochi', age: 21 });
+a.add({ name: 'Marta', age: 22 });
+
+var b = { name: 'Carlos', age: 22 };
+var c = [{ name: 'Carlos', age: 22 }, { name: 'Maritza', age: 22 }];
+
+var all = a.getAll();
+
+//console.log(all);
+//console.log(all[0].cid);
+//a.remove(all[0].cid);
+//console.log(a.getAllRemoved());
+//console.log(a.recoverAllRemoved());
+//console.log(a.getAll());

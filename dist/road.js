@@ -48,6 +48,7 @@ var road = function road()
 			
 	}
 	
+	// Validate if CID is passed correctly as parameter
 	function validateCID(cid) {
 		// Check if a cid was passed
 		if (cid)
@@ -58,12 +59,12 @@ var road = function road()
 		else
 			throw 'Missing cid';
 	}
-		
+	
 	return {
 		
 		// 						>>> Memory Methods <<<
 		
-		// Not Removed Items
+		// >> Not Removed Items
 		add: function add(obj, fun, status) {
 			try {
 				// Initialize
@@ -258,7 +259,7 @@ var road = function road()
 			try
 			{
 				data = [];
-				data = this.add(newData, { sendBack: true});
+				data = this.add(newData, { sendBack: true}, 'origin');
 			}
 			catch(err)
 			{ throw err; }
@@ -368,7 +369,7 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		// Removed Items
+		// >> Removed Items
 		getAllRemoved: function getAllRemoved() {
 			try {
 				return dataRemoved;
@@ -555,8 +556,67 @@ var road = function road()
 			catch(err) { return err; }
 		},
 		
-		// Ajax Requests
+		// 				>>> Local Storage <<<
 		
+		// Check if Local Storage is Supported
+		isLocalStorageSupported: function supportsLocalStorage() {
+			try {
+				return 'localStorage' in window && window['localStorage'] !== null;
+			} catch (e) 
+			{ return false; }
+		},
+		
+		// Save in Local Storage
+		saveLocalStorage: function saveLocalStorage() {
+			try {
+				if (this.isLocalStorageSupported())
+				{
+					localStorage['live'] = JSON.stringify(data);
+					localStorage['removed'] = JSON.stringify(dataRemoved);
+				}
+				else
+					throw 'No local storage supported.'
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		// Load from Local Storage
+		loadLocalStorage: function loadLocalStorage() {
+			try {
+				if (this.isLocalStorageSupported())
+				{
+					data = [];
+					dataRemoved = [];
+					
+					data = JSON.parse(localStorage['live']);
+					dataRemoved = JSON.parse(localStorage['removed']);
+				}
+				else
+					throw 'No local storage supported.'
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		// Clean Local Storage
+		cleanLocalStorage: function cleanLocalStorage() {
+			try {
+				if (this.isLocalStorageSupported())
+				{
+					localStorage['live'] = null;
+					localStorage['removed'] = null;
+				}
+				else
+					throw 'No local storage supported.'
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		// 				>>> Ajax Requests <<<
+		
+		// Load data through non-async request
 		load: function load(ajaxParams) {
 			try {
 				// Validate there are params

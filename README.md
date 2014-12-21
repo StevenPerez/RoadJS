@@ -87,3 +87,27 @@ people.getAll();
   people.getAllRemoved();
   // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "removed"}
 ```
+<h5>update</h5>
+<h6>Update properties to a "live" object</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "new"}
+// Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+
+people.update({name: 'Duck'}, 'ci3yuixr900003255e4eh1u7o');
+// Object {name: "Duck", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"} // Now status = changed
+
+people.update({name: 'Duck', cuid: 'ci3yuixr900003255e4eh1u7o'}); // same result
+// Object {name: "Duck", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"} // Now status = changed
+```
+
+<h5>delete</h5>
+<h6>Change the status to deleted in an Object</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"}
+// Object {name: "Maritza", age: 22, cuid: "ci3yuixrc00013255m0ohe0uq", status: "new"} // Delete this
+
+people.delete('ci3yuixrc00013255m0ohe0uq');
+
+```

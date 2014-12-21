@@ -2,33 +2,7 @@ var road = function road()
 {
 	var data = [];				// Object container of the information
 	var dataRemoved = [];		// Object container of the information
-	var idCounter = 0;			// Avoid CID duplicates
-	
-	// Generate Cache ID at the moment to Add or Set new data
-	function genID()	
-	{
-		try
-		{
-			var now = new Date();
-
-			var components = [
-				now.getFullYear(),
-				(now.getMonth() + 1) < 9 ? '0' + now.getMonth().toString() : now.getMonth().toString(),
-				(now.getDate() < 9) ? '0' + now.getDate().toString() : now.getDate().toString(),
-				now.getHours(),
-				now.getMinutes(),
-				now.getSeconds(),
-				now.getMilliseconds()
-			];
-
-			return components.join("");
-		}
-		catch(err)
-		{
-			return '';
-		}
-	}
-	
+		
 	// Update the Destination property's values base on the Source
 	// when key properties match
 	function updateProperties(Source, Destination)
@@ -49,15 +23,15 @@ var road = function road()
 	}
 	
 	// Validate if CID is passed correctly as parameter
-	function validateCID(cid) {
-		// Check if a cid was passed
-		if (cid)
+	function validateCUID(cuid) {
+		// Check if a cuid was passed
+		if (cuid)
 		{
-			if (typeof(cid) == 'number')
-				throw 'cid value should be String';
+			if (typeof(cuid) == 'number')
+				throw 'cuid value should be String';
 		}
 		else
-			throw 'Missing cid';
+			throw 'Missing cuid';
 	}
 	
 	return {
@@ -88,7 +62,8 @@ var road = function road()
 					for (var i = 0; i < length; i++)
 					{
 						if (status != 'recovered')
-							obj[i].cid 		= genID() + i.toString(); // Avoid duplicity adding the counter
+							obj[i].cuid 		= cuid();
+						
 						obj[i].status 	= status;
 												
 						// Clone Extended Object
@@ -103,7 +78,7 @@ var road = function road()
 				// If it is just one Object
 				{					
 					if (status != 'recovered')
-						obj.cid 		= genID() + idCounter.toString();
+						obj.cuid 		= cuid();
 					obj.status 		= status;
 										
 					// Clone Extended Object
@@ -112,11 +87,6 @@ var road = function road()
 
 					// Add the Object
 					data.push(copiedObject);
-					
-					
-					idCounter++;
-					idCounter = (idCounter > 99) ? 0 : idCounter;
-
 				}
 									
 				// Return Object
@@ -127,26 +97,26 @@ var road = function road()
 			{ throw err; }
 		},
 				
-		remove: function remove(cid) {
+		remove: function remove(cuid) {
 			try
 			{
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 				
-				// Check if a cid was not passed
+				// Check if a cuid was not passed
 				if (this.length() == 0)
 					throw 'No data in memory';
 				
 				// Get the index of the item to delete
 				var removeIndex = data.map(function(data) 
-										   { return data.cid; })
-									   .indexOf(cid);
+										   { return data.cuid; })
+									   .indexOf(cuid);
 				
 				// If an object was found
 				if (removeIndex >= 0) 
 				{					
 					// Add the Clone to dataRemoved
-					var objRemoved = this.getByCID(cid);
+					var objRemoved = this.getByCUID(cuid);
 					objRemoved.status = 'removed';
 					
 					dataRemoved.push(objRemoved);
@@ -161,16 +131,16 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		update: function update(obj, cid) {
+		update: function update(obj, cuid) {
 			try {
 				// Validations
 				if (!obj)
 					throw 'Missing object';
 								
-				if (cid)
+				if (cuid)
 				{
-					if (typeof(cid) == 'number')
-						throw 'cid value should be String';
+					if (typeof(cuid) == 'number')
+						throw 'cuid value should be String';
 				}
 				
 				var length = 0;
@@ -187,14 +157,14 @@ var road = function road()
 					// Loop and add the properties to each Object
 					for (var i = 0; i < length; i++)
 					{
-						if (!obj[i].cid)
-							throw 'For array updates it is required the cid property on each object.';
-						// Get the object from Data by cid
-						var objData = this.getByCID(obj[i].cid, false);
+						if (!obj[i].cuid)
+							throw 'For array updates it is required the cuid property on each object.';
+						// Get the object from Data by cuid
+						var objData = this.getByCUID(obj[i].cuid, false);
 						
 						// Validate if item was found
 						if (objData == undefined)
-							throw 'No item found for cid ' + cid.toString();
+							throw 'No item found for cuid ' + cuid.toString();
 						
 						// Update the properties between Source and Destination
 						updateProperties(obj[i], objData);
@@ -204,24 +174,24 @@ var road = function road()
 				else
 				// If it is just one Object
 				{
-					if (!obj.cid && !cid)
-						throw 'Missing cid';
+					if (!obj.cuid && !cuid)
+						throw 'Missing cuid';
 				
-					if (!cid && obj.cid)
-						cid = cid || obj.cid;
+					if (!cuid && obj.cuid)
+						cuid = cuid || obj.cuid;
 					
-					// Get the object from Data by cid
-					var objData = this.getByCID(cid.toString(), false);
+					// Get the object from Data by cuid
+					var objData = this.getByCUID(cuid.toString(), false);
 					
 					// Validate if item was found
 					if (objData == undefined)
-						throw 'No item found for cid ' + cid.toString();
+						throw 'No item found for cuid ' + cuid.toString();
 					
 					// Update the properties between Source and Destination
 					updateProperties(obj, objData);
 					
-					// Change Status and reinforce the cid item
-					objData.cid = cid.toString();
+					// Change Status and reinforce the cuid item
+					objData.cuid = cuid.toString();
 					objData.status = 'changed';
 				}
 				
@@ -230,20 +200,20 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		delete: function del(cid) {
+		delete: function del(cuid) {
 			try {
 				
-				validateCID(cid);
+				validateCUID(cuid);
 
 				// Get Object to change status as deleted
-				var obj = this.getByCID(cid);
+				var obj = this.getByCUID(cuid);
 				
 				// Validate if item was found
 				if (obj == undefined || obj == [])
-					throw 'No item found for cid ' + cid.toString();
+					throw 'No item found for cuid ' + cuid.toString();
 				
-				// Change Status and reinforce the cid item				
-				obj.cid 	=  cid;
+				// Change Status and reinforce the cuid item				
+				obj.cuid 	=  cuid;
 				obj.status 	= 'deleted';
 
 			}
@@ -269,23 +239,23 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		getByCID: function getByCID(cid, isClone) {
+		getByCUID: function getByCUID(cuid, isClone) {
 			try
 			{					
 				// If it is undefined then create a Clone of the
 				// returned object
 				if (isClone == undefined) { isClone = true; }
 				
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 				
 				// Filter Items
 				var result = data.filter(function(item) 
-										 { return item.cid == cid; }
+										 { return item.cuid == cuid; }
 								  )[0];
 				
 				if (!result)
-					throw 'No item found for cid ' + cid;
+					throw 'No item found for cuid ' + cuid;
 				
 				if (isClone)
 				{
@@ -338,23 +308,23 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		getRemovedByCID: function getRemovedByCID(cid, isClone) {
+		getRemovedByCUID: function getRemovedByCUID(cuid, isClone) {
 			try	
 			{	
 				// If it is undefined then create a Clone of the
 				// returned object
 				if (isClone == undefined) { isClone = true; }
 
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 
 				// Filter Items
 				var result = dataRemoved.filter(function(item) 
-											{ return item.cid == cid; }
+											{ return item.cuid == cuid; }
 										 )[0];
 
 				if (!result)
-					throw 'No item found for cid ' + cid;
+					throw 'No item found for cuid ' + cuid;
 
 				if (isClone)
 				{
@@ -386,20 +356,20 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		destroyRemovedByCID: function destroyRemovedByCID(cid) {
+		destroyRemovedByCUID: function destroyRemovedByCUID(cuid) {
 			try
 			{
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 				
-				// Check if a cid was not passed
+				// Check if a cuid was not passed
 				if (this.lengthRemoved() == 0)
 					throw 'No data in memory';
 				
 				// Get the index of the item to delete
 				var removeIndex = dataRemoved.map(function(dataRemoved) 
-												  { return dataRemoved.cid; })
-											 .indexOf(cid);
+												  { return dataRemoved.cuid; })
+											 .indexOf(cuid);
 				
 				// If an object was found
 				if (removeIndex >= 0) 
@@ -414,28 +384,28 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		recoverRemovedByCID: function recoverRemovedByCID(cid) {
+		recoverRemovedByCUID: function recoverRemovedByCUID(cuid) {
 			try {
 				
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 				
-				// Check if a cid was not passed
+				// Check if a cuid was not passed
 				if (this.lengthRemoved() == 0)
 					throw 'No data in memory';
 				
 				// Get the item to recover from the removed list
-				var objRecover = this.getRemovedByCID(cid);
+				var objRecover = this.getRemovedByCUID(cuid);
 				
 				// Check if the item was found
 				if (!objRecover)
-					throw 'No item found for cid ' + cid.toString();
+					throw 'No item found for cuid ' + cuid.toString();
 				
 				// Add the item to the Non removed list
 				this.add(objRecover, null, 'recovered');
 				
 				// Remove item from the Removed list
-				this.destroyRemovedByCID(cid);
+				this.destroyRemovedByCUID(cuid);
 			}
 			catch (err)
 			{ throw err; }
@@ -444,7 +414,7 @@ var road = function road()
 		recoverAllRemoved: function recoverAllRemoved() {
 			try {
 				
-				// Check if a cid was not passed
+				// Check if a cuid was not passed
 				if (this.lengthRemoved() == 0)
 					throw 'No data in memory';
 
@@ -686,12 +656,12 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		serverSendByCID: function sendByCID(cid, ajaxUrl, isJSON) {
+		serverSendByCUID: function serverSendByCUID(cuid, ajaxUrl, isJSON) {
 			try {
 				var ajaxParams = {};
 				
-				// Check if a cid was passed
-				validateCID(cid);
+				// Check if a cuid was passed
+				validateCUID(cuid);
 				
 				// Initialize isJSON
 				if (isJSON == undefined) { isJSON = false; }
@@ -701,13 +671,13 @@ var road = function road()
 					throw 'Missing ajax url parameter';
 				
 				// Initialize Data
-				var objToSend = this.getByCID(cid);
+				var objToSend = this.getByCUID(cuid);
 				
 				if (!objToSend) 
-					objToSend = this.getRemovedByCID(cid);
+					objToSend = this.getRemovedByCUID(cuid);
 				
 				if (typeof(objToSend) == 'string')
-					throw 'No item found for cid ' + cid;
+					throw 'No item found for cuid ' + cuid;
 			
 				// -----------------------------------------------------------
 				

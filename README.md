@@ -42,7 +42,8 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <br />
 <h3>Road Methods</h3>
 
-<h5>Add</h5>
+<h5>add</h5>
+<h6>Add items to the "live" array</h6>
 ```javascript
 // Create People
 var people = road();
@@ -55,4 +56,34 @@ people.add({ name: 'Steven', age: 28 });
 people.add({ name: 'Steven', age: 28 }, { sendBack : true });
 // Object {name: "Steven", age: 28, cuid: "ci3yr5zee00003252z62qx6gy", status: "new"}
 
+people.add({ name: 'Steven', age: 28 }, { sendBack : true }, 'Cust'); // Adding Custom Status
+// Object {name: "Steven", age: 28, cuid: "ci3ytspj700003252exffkyae", status: "Cust"}
+
+// Adding Arrays
+var friends = [{ name: 'Eric', age: 22 }, { name: 'Maritza', age: 22 }];
+people.add(friends);
+// undefined
+```
+
+<h5>getAll</h5>
+<h6>Return all the "live" array objects</h6>
+```javascript
+people.getAll();
+// [Object, Object, ...]
+```
+<h5>remove</h5>
+<h6>Move an object from "live" array to "removed" array</h6>
+```javascript
+  people.getAll();
+  // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "new"} => Remove This
+  // Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+  people.remove('ci3ytv6xk000032534caqjx6o');
+  
+  // Check
+  people.getAll();
+  // Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+  
+  // The item was moved to removed array
+  people.getAllRemoved();
+  // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "removed"}
 ```

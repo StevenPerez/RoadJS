@@ -38,5 +38,11 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 var people = road();
 
 people.add({ name: 'Steven', age: 28 });
-// Object Added => Object {name: "Steven", age: 20, cuid: "ci3yr0js000003252zgao2whl", status: "new"}
+// undefined
+// Note: but  the item was added 
+// => Object {name: "Steven", age: 20, cuid: "ci3yr0js000003252zgao2whl", status: "new"}
+
+people.add({ name: 'Steven', age: 28 }, { sendBack : true });
+// Object {name: "Steven", age: 28, cuid: "ci3yr5zee00003252z62qx6gy", status: "new"}
+
 ```

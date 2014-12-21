@@ -3,7 +3,7 @@ var road = function road()
 	var data = [];				// Object container of the information
 	var dataRemoved = [];		// Object container of the information
 	var idCounter = 0;			// Avoid CID duplicates
-
+	
 	// Generate Cache ID at the moment to Add or Set new data
 	function genID()	
 	{
@@ -59,9 +59,9 @@ var road = function road()
 		else
 			throw 'Missing cid';
 	}
-		
+	
 	return {
-				
+		
 		// 						>>> Memory Methods <<<
 		
 		// >> Not Removed Items
@@ -87,7 +87,8 @@ var road = function road()
 					// Loop and add the properties to each Object
 					for (var i = 0; i < length; i++)
 					{
-						obj[i].cid 		= genID() + i.toString(); // Avoid duplicity adding the counter
+						if (status != 'recovered')
+							obj[i].cid 		= genID() + i.toString(); // Avoid duplicity adding the counter
 						obj[i].status 	= status;
 												
 						// Clone Extended Object
@@ -101,7 +102,8 @@ var road = function road()
 				else
 				// If it is just one Object
 				{					
-					obj.cid 		= genID() + idCounter.toString();
+					if (status != 'recovered')
+						obj.cid 		= genID() + idCounter.toString();
 					obj.status 		= status;
 										
 					// Clone Extended Object
@@ -116,11 +118,7 @@ var road = function road()
 					idCounter = (idCounter > 99) ? 0 : idCounter;
 
 				}
-					
-				// Call OK Event function
-				if (fun.ok)
-					fun.ok.call();
-				
+									
 				// Return Object
 				if (fun.sendBack)
 					return obj;
@@ -148,7 +146,10 @@ var road = function road()
 				if (removeIndex >= 0) 
 				{					
 					// Add the Clone to dataRemoved
-					dataRemoved.push(this.getByCID(cid))	;
+					var objRemoved = this.getByCID(cid);
+					objRemoved.status = 'removed';
+					
+					dataRemoved.push(objRemoved);
 					
 					// Remove the Item
 					data.splice(removeIndex, 1);
@@ -431,7 +432,7 @@ var road = function road()
 					throw 'No item found for cid ' + cid.toString();
 				
 				// Add the item to the Non removed list
-				this.add(objRecover);
+				this.add(objRecover, null, 'recovered');
 				
 				// Remove item from the Removed list
 				this.destroyRemovedByCID(cid);
@@ -448,7 +449,7 @@ var road = function road()
 					throw 'No data in memory';
 
 				for (var i = 0; i < this.lengthRemoved(); i++)
-					this.add(dataRemoved[i]);
+					this.add(dataRemoved[i], null, 'recovered');
 
 				// Clean the Removed list
 				this.cleanRemoved();
@@ -538,14 +539,18 @@ var road = function road()
 		// 				>>> Ajax Requests <<<
 		
 		// Load data through non-async request
-		load: function load(ajaxParams) {
+		serverLoad: function load(ajaxUrl) {
 			try {
+				var ajaxParams = {};
+				
 				// Validate there are params
-				if (!ajaxParams)
-					throw 'Missing ajax parameters';
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
 				
 				// Set not async load
 				ajaxParams.async = false;
+				ajaxParams.method = 'GET';
+				ajaxParams.url = ajaxUrl;
 				
 				// Initialize Data
 				data = [];
@@ -567,15 +572,159 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		sendByCID: function sendByCID(cid, ajaxParams) {
+		serverSendAll: function serverSendAll(ajaxUrl, isJSON) {
 			try {
+				var ajaxParams = {};
+				
+				// Initialize isJSON
+				if (isJSON == undefined) { isJSON = false; }
+				
+				// Validate there are params
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
+				
+				if (!data || data == [])
+					throw 'No data found.';
+					
+				// -----------------------------------------------------------
+				
+				if (isJSON == false)
+					ajaxParams.data = { 'data': data };
+				else
+					ajaxParams.data = JSON.stringify(data);
+				
+				ajaxParams.async = false;
+				ajaxParams.method = 'POST';
+				ajaxParams.url = ajaxUrl;
+				
+				// Send and Get Ajax Response
+				var reponseAjax = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				return reponseAjax;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		serverSendAllRemoved: function serverSendAll(ajaxUrl, isJSON) {
+			try {
+				var ajaxParams = {};
+				
+				// Initialize isJSON
+				if (isJSON == undefined) { isJSON = false; }
+				
+				// Validate there are params
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
+				
+				if (!dataRemoved || dataRemoved == [])
+					throw 'No data found.';
+					
+				// -----------------------------------------------------------
+				
+				if (isJSON == false)
+					ajaxParams.data = { 'data': dataRemoved };
+				else
+					ajaxParams.data = JSON.stringify(dataRemoved);
+				
+				ajaxParams.async = false;
+				ajaxParams.method = 'POST';
+				ajaxParams.url = ajaxUrl;
+				
+				// Send and Get Ajax Response
+				var reponseAjax = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				return reponseAjax;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		serverSendFilter: function serverSendAll(ajaxUrl, criteria, isJSON) {
+			try {
+				var ajaxParams = {};
+				
+				// Initialize isJSON
+				if (isJSON == undefined) { isJSON = false; }
+				
+				// Validate there are params
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
+				
+				// Validate there are params
+				if (!criteria)
+					throw 'Missing filter criteria parameter';
+				
+				if (!data || data == [] && !dataRemoved || dataRemoved == [])
+					throw 'No data found.';
+					
+				// -----------------------------------------------------------
+				
+				var objFiltered = [];
+				
+				this.filter(criteria).forEach( function(item){ objFiltered.push(item); });
+				this.filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
+				
+				if (isJSON == false)
+					ajaxParams.data = { 'data': objFiltered };
+				else
+					ajaxParams.data = JSON.stringify(objFiltered);
+				
+				ajaxParams.async = false;
+				ajaxParams.method = 'POST';
+				ajaxParams.url = ajaxUrl;
+				
+				// Send and Get Ajax Response
+				var reponseAjax = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				return reponseAjax;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		serverSendByCID: function sendByCID(cid, ajaxUrl, isJSON) {
+			try {
+				var ajaxParams = {};
 				
 				// Check if a cid was passed
 				validateCID(cid);
 				
+				// Initialize isJSON
+				if (isJSON == undefined) { isJSON = false; }
+				
 				// Validate there are params
-				if (!ajaxParams)
-					throw 'Missing ajax parameters';
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
+				
+				// Initialize Data
+				var objToSend = this.getByCID(cid);
+				
+				if (!objToSend) 
+					objToSend = this.getRemovedByCID(cid);
+				
+				if (typeof(objToSend) == 'string')
+					throw 'No item found for cid ' + cid;
+			
+				// -----------------------------------------------------------
+				
+				if (isJSON == false)
+					ajaxParams.data = objToSend;
+				else
+					ajaxParams.data = JSON.stringify(objToSend);
+				
+				ajaxParams.async = false;
+				ajaxParams.method = 'POST';
+				ajaxParams.url = ajaxUrl;
+				
+				// Send and Get Ajax Response
+				var reponseAjax = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				return reponseAjax;
 			}
 			catch (err)
 			{ throw err; }

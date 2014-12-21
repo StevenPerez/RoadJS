@@ -105,9 +105,10 @@ people.update({name: 'Duck', cuid: 'ci3yuixr900003255e4eh1u7o'}); // same result
 <h6>Change the status to deleted in an Object</h6>
 ```javascript
 people.getAll();
-// Object {name: "Carlos", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"}
-// Object {name: "Maritza", age: 22, cuid: "ci3yuixrc00013255m0ohe0uq", status: "new"} // Delete this
+// Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "new"}
+// Object {name: "Maritza", age: 22, cuid: "ci3yus8oe000132557hdpexjb", status: "new"}
 
-people.delete('ci3yuixrc00013255m0ohe0uq');
+people.delete('ci3yus8oa00003255mm0bzo0w');
+// Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "deleted"}
 
 ```

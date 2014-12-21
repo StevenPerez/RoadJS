@@ -28,3 +28,15 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <strong>status:removed -</strong> it refers when you use the road.remove(CUID) method, it remove the item from the "live" <strong>data</strong> array and move the item to the <strong>dataRemoved</strong> "trash" Array in memory to the item linked by the CUID.
 <br /><br />
 <strong>status:recovered -</strong> it refers when you use the road.recoverRemovedByCUID(CUID) / road.recoverAllRemoved() methods, it recovers the item from the <strong>dataRemoved</strong> "trash" Array to the "live" <strong>data</strong> array in memory.
+
+<br />
+<h3>Road Methods</h3>
+
+<h5>Add</h5>
+```javascript
+// Create People
+var people = road();
+
+people.add({ name: 'Steven', age: 28 });
+// Object Added => Object {name: "Steven", age: 20, cuid: "ci3yr0js000003252zgao2whl", status: "new"}
+```

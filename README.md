@@ -4,6 +4,16 @@ RoadJS
 Useful memory Array object management library, it is very helpful when you want to perform changes on properties, save and recover the Array [objects] in memory or store and load the Array from the Web Browser's local storage, filter, work with removed items, ajax request to load and send from the server and so on...
 <br/><br/>
 
+<h3>RoadJS Implementation</h3>
+```html
+<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="browser-cuid.js"></script>
+<script type="text/javascript" src="road.min.js"></script></body>
+OR
+<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="road-cuid.min.js"></script>
+```
+
 <h3>Brief Introduction behind RoadJS</h3>
 RoadJS manages two internal Arrays:
 

@@ -4,6 +4,16 @@ RoadJS
 Useful memory Array object management library, it is very helpful when you want to perform changes on properties, save and recover the Array [objects] in memory or store and load the Array from the Web Browser's local storage, filter, work with removed items, ajax request to load and send from the server and so on...
 <br/><br/>
 
+<h3>RoadJS Implementation</h3>
+```html
+<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="browser-cuid.js"></script>
+<script type="text/javascript" src="road.min.js"></script></body>
+OR
+<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="road-cuid.min.js"></script>
+```
+
 <h3>Brief Introduction behind RoadJS</h3>
 RoadJS manages two internal Arrays:
 
@@ -32,7 +42,8 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <br />
 <h3>Road Methods</h3>
 
-<h5>Add</h5>
+<h5>add</h5>
+<h6>Add items to the "live" array</h6>
 ```javascript
 // Create People
 var people = road();
@@ -44,5 +55,60 @@ people.add({ name: 'Steven', age: 28 });
 
 people.add({ name: 'Steven', age: 28 }, { sendBack : true });
 // Object {name: "Steven", age: 28, cuid: "ci3yr5zee00003252z62qx6gy", status: "new"}
+
+people.add({ name: 'Steven', age: 28 }, { sendBack : true }, 'Cust'); // Adding Custom Status
+// Object {name: "Steven", age: 28, cuid: "ci3ytspj700003252exffkyae", status: "Cust"}
+
+// Adding Arrays
+var friends = [{ name: 'Eric', age: 22 }, { name: 'Maritza', age: 22 }];
+people.add(friends);
+// undefined
+```
+
+<h5>getAll</h5>
+<h6>Return all the "live" array objects</h6>
+```javascript
+people.getAll();
+// [Object, Object, ...]
+```
+<h5>remove</h5>
+<h6>Move an object from "live" array to "removed" array</h6>
+```javascript
+  people.getAll();
+  // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "new"} => Remove This
+  // Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+  people.remove('ci3ytv6xk000032534caqjx6o');
+  
+  // Check
+  people.getAll();
+  // Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+  
+  // The item was moved to removed array
+  people.getAllRemoved();
+  // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "removed"}
+```
+<h5>update</h5>
+<h6>Update properties to a "live" object</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "new"}
+// Object {name: "Maritza", age: 22, cuid: "ci3ytv6xl00013253uxurwohm", status: "new"}
+
+people.update({name: 'Duck'}, 'ci3yuixr900003255e4eh1u7o');
+// Object {name: "Duck", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"} // Now status = changed
+
+people.update({name: 'Duck', cuid: 'ci3yuixr900003255e4eh1u7o'}); // same result
+// Object {name: "Duck", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "changed"} // Now status = changed
+```
+
+<h5>delete</h5>
+<h6>Change the status to deleted in an Object</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "new"}
+// Object {name: "Maritza", age: 22, cuid: "ci3yus8oe000132557hdpexjb", status: "new"}
+
+people.delete('ci3yus8oa00003255mm0bzo0w');
+// Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "deleted"}
 
 ```

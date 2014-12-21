@@ -206,7 +206,7 @@ var road = function road()
 				validateCUID(cuid);
 
 				// Get Object to change status as deleted
-				var obj = this.getByCUID(cuid);
+				var obj = this.getByCUID(cuid, false);
 				
 				// Validate if item was found
 				if (obj == undefined || obj == [])

@@ -44,7 +44,7 @@ var road = function road()
 				
 				// Initialize
 				fun = fun || {};
-				fun.send_back = fun.send_back || false;
+				fun.sendBack = fun.sendBack || false;
 				status = status || 'new';
 				
 				var length = 0;

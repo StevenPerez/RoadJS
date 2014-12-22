@@ -244,3 +244,44 @@ people.getAll();
 // Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "recovered"}
 
 ```
+<h5>recoverAllRemoved</h5>
+<h6>Recover All the "removed" objects to the "live" array</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "removed"}
+// Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "removed"}
+
+// Recover all the removed items
+people.recoverAllRemoved();
+
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "recovered"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "recovered"}
+// Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "recovered"}
+
+```
+
+<h5>filterRemoved</h5>
+<h6>Return the objects from the "removed" array where the Lambda criteria matches</h6>
+```javascript
+people.filterRemoved(function (x) { return x.name == 'Mary' && x.age == 22; });
+// Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "removed"}
+
+```
+<h5>destroyRemovedByCUID</h5>
+<h6>Destroy a "removed" object by CUID, the item will not be accessible anymore</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "removed"}
+// Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "removed"}
+
+// Destroy from memory
+people.destroyRemovedByCUID('ci3zbod4n00023255ou8ldbtu');
+
+people.getAllRemoved();
+// Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "removed"}
+
+```

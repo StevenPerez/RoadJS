@@ -172,7 +172,7 @@ person.name = 'Jhon'; // It changes the person object AND the source
 // Source people.getAll() was changed
 // Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
 ```
-
+<br />
 <h4>dataRemoved Array "Trash"</h4>
 
 <h5>getAllRemoved</h5>
@@ -283,5 +283,43 @@ people.destroyRemovedByCUID('ci3zbod4n00023255ou8ldbtu');
 people.getAllRemoved();
 // Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
 // Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "removed"}
+
+```
+
+<br />
+<h4>Local Storage - Web Browser</h4>
+
+<h5>isLocalStorageSupported</h5>
+<h6>Returns if the current web browser supports local storage</h6>
+```javascript
+people.isLocalStorageSupported();
+// true / false
+```
+
+<h5>saveLocalStorage</h5>
+<h6>Saves the "live" and "removed" items into the local storage</h6>
+```javascript
+people.saveLocalStorage();
+
+```
+
+<h5>loadLocalStorage</h5>
+<h6>Load the "live" and "removed" objects into the road's arrays</h6>
+```javascript
+// Load from local storage
+people.loadLocalStorage();
+
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "new"}
+
+people.getAllRemoved();
+// Object {name: "Maritza", age: 22, cuid: "ci3zbod4m00013255d49pu9qg", status: "removed"}
+```
+
+<h5>cleanLocalStorage</h5>
+<h6>Clean the local storage memory</h6>
+```javascript
+
+people.cleanLocalStorage();
 
 ```

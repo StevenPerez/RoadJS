@@ -42,12 +42,14 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <br />
 <h3>Road Methods</h3>
 
-<h5>add</h5>
-<h6>Add items to the "live" array</h6>
 ```javascript
 // Create People
 var people = road();
+```
 
+<h5>add</h5>
+<h6>Add items to the "live" array</h6>
+```javascript
 people.add({ name: 'Steven', age: 28 });
 // undefined
 // Note: but  the item was added 

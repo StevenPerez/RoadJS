@@ -1,7 +1,7 @@
 RoadJS
 ======
 
-Useful memory Array object management library, it is very helpful when you want to perform changes on properties, save and recover the Array [objects] in memory or store and load the Array from the Web Browser's local storage, filter, work with removed items, ajax request to load and send from the server and so on...
+Useful memory Array object management library that improves the way you perform changes on properties, save and recover the Array [objects] in memory or store and load the Array from the Web Browser's local storage, filter, work with removed items, ajax request (load and send) to the server and so on...
 <br/><br/>
 
 <h3>RoadJS Implementation</h3>

@@ -112,3 +112,63 @@ people.delete('ci3yus8oa00003255mm0bzo0w');
 // Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "deleted"}
 
 ```
+<h5>setData</h5>
+<h6>Replace the "live" array for another one</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 24, cuid: "ci3yus8oa00003255mm0bzo0w", status: "new"}
+// Object {name: "Ana", age: 32, cuid: "ci3yus8oe000132557hdpexjb", status: "new"}
+
+var friends = [
+	{ name: 'Carlos', age: 22 }, 
+	{ name: 'Maritza', age: 22 },
+	{ name: 'Mary', age: 22 }
+];
+
+people.setData(friends);
+// Object {name: "Carlos", age: 22, cuid: "ci3zab93d00003255zxg3x2cj", status: "origin"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zab93h00013255it22cjg3", status: "origin"}
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+```
+<h5>length</h5>
+<h6>Returns the length of the "live" array</h6>
+```javascript
+people.length();
+// 3
+
+```
+<h5>filter</h5>
+<h6>Return the objects from the "live" array where the Lambda criteria matches</h6>
+```javascript
+people.filter(function (x) { return x.name == 'Mary' && x.age == 22; });
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+```
+<h5>getByCUID</h5>
+<h6>Return the objects from the "live" array by CUID, you can return in two ways:</h6>
+```javascript
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3zab93d00003255zxg3x2cj", status: "origin"}
+// Object {name: "Maritza", age: 22, cuid: "ci3zab93h00013255it22cjg3", status: "origin"}
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+// #1 - Item without link from the source (extended).
+var person = people.getByCUID('ci3zab93h000232554wzxkji5');
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+person.name = 'Jhon'; // It changes the person object but not the source
+// Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+// Source people.getAll() still without changes
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+
+// #2 - Item linked to the source (not extended).
+var person = people.getByCUID('ci3zab93h000232554wzxkji5', false);
+// Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+person.name = 'Jhon'; // It changes the person object but not the source
+// Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+
+// Source people.getAll() was changed
+// Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+```

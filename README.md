@@ -323,3 +323,81 @@ people.getAllRemoved();
 people.cleanLocalStorage();
 
 ```
+
+<br />
+<h4>Ajax Non-Async Requests</h4>
+
+<h5>serverLoad</h5>
+<h6>Call a GET verb to a url and then load the "live" array, it could be JSON or JS Array</h6>
+```javascript
+
+// default: method: get | async: false
+
+people.serverLoad('/json');
+
+people.getAll();
+// Object {name: "Steven", age: 28, id: 1, cuid: "ci3zcivvc00033255oi5x9fyi", status: "origin"}
+// Object {name: "Carlos", age: 21, id: 2, cuid: "ci3zcivvc00043255g80zkt21", status: "origin"}
+
+```
+
+<h5>serverSendAll</h5>
+<h6>Send "live" array to the server, it could be JSON or JS Array</h6>
+```javascript
+
+// default: method: post | async: false
+
+// As JS Array
+people.serverSendAll('/items');
+// "{"data":[{"name":"Steven","age":"28","id":"1","cuid":"ci3zcivvc00033255oi5x9fyi","status":"origin"},{"name":"Carlos","age":"21","id":"2","cuid":"ci3zcivvc00043255g80zkt21","status":"origin"},{"name":"Mochi","age":"20","id":"3","cuid":"ci3zcivvc00053255eyiv3bml","status":"origin"}]}"
+
+// As JSON Array
+people.serverSendAll('/items', true);
+// "[{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"origin"},{"name":"Carlos","age":21,"id":2,"cuid":"ci3zcivvc00043255g80zkt21","status":"origin"},{"name":"Mochi","age":20,"id":3,"cuid":"ci3zcivvc00053255eyiv3bml","status":"origin"}]"
+
+```
+
+<h5>serverSendAllRemoved</h5>
+<h6>Send "removed" array to the server, it could be JSON or JS Array</h6>
+```javascript
+// default: method: post | async: false
+
+// As JS Array
+people.serverSendAllRemoved('/items');
+// "{"data":[{"name":"Steven","age":"28","id":"1","cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"},{"name":"Carlos","age":"21","id":"2","cuid":"ci3zcivvc00043255g80zkt21","status":"removed"},{"name":"Mochi","age":"20","id":"3","cuid":"ci3zcivvc00053255eyiv3bml","status":"removed"}]}"
+
+// As JSON Array
+people.serverSendAllRemoved('/items', true);
+// "[{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"},{"name":"Carlos","age":21,"id":2,"cuid":"ci3zcivvc00043255g80zkt21","status":"removed"},{"name":"Mochi","age":20,"id":3,"cuid":"ci3zcivvc00053255eyiv3bml","status":"removed"}]"
+
+```
+
+<h5>serverSendFilter</h5>
+<h6>Send "live" and "removed" Objects to the server when the filter criteria match, it could be JSON or JS Array</h6>
+```javascript
+// default: method: post | async: false
+
+// As JS Array
+people.serverSendFilter('/item', function(x) { return x.name == 'Steven'; });
+// "{"data":[{"name":"Steven","age":"28","id":"1","cuid":"ci3zcivvc00033255oi5x9fyi","status":"origin"}]}"
+
+// As JSON Array
+people.serverSendFilter('/item', function(x) { return x.name == 'Steven'; }, true);
+// "{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"}"
+
+```
+
+<h5>serverSendByCUID</h5>
+<h6>Send "live" or "removed" Object to the server when the CUID match, it could be JSON or JS Array</h6>
+```javascript
+// default: method: post | async: false
+
+// As JS Array
+people.serverSendByCUID('ci3zcivvc00033255oi5x9fyi', '/item');
+// "{"name":"Steven","age":"28","id":"1","cuid":"ci3zcivvc00033255oi5x9fyi","status":"origin"}"
+
+// As JSON Array
+people.serverSendByCUID('ci3zcivvc00033255oi5x9fyi', '/item', true);
+// "{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"}"
+
+```

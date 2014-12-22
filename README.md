@@ -166,9 +166,81 @@ person.name = 'Jhon'; // It changes the person object but not the source
 // #2 - Item linked to the source (not extended).
 var person = people.getByCUID('ci3zab93h000232554wzxkji5', false);
 // Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
-person.name = 'Jhon'; // It changes the person object but not the source
+person.name = 'Jhon'; // It changes the person object AND the source
 // Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
 
 // Source people.getAll() was changed
 // Object {name: "Jhon", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
+```
+
+<h4>dataRemoved Array "Trash"</h4>
+
+<h5>getAllRemoved</h5>
+<h6>Returns all the objects from the "removed" array</h6>
+```javascript
+
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "new"}
+
+people.remove('ci3zb3v2k00003255tdncj0qu'); // Remove the item, now it is in the dataRemoved Array
+
+people.getAllRemoved();
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+```
+
+<h5>lengthRemoved</h5>
+<h6>Returns the length of the "removed" array</h6>
+```javascript
+people.lengthRemoved();
+// 1
+
+```
+
+<h5>cleanRemoved</h5>
+<h6>Initialize with an empty "removed" array</h6>
+```javascript
+people.cleanRemoved();
+// []
+
+```
+
+<h5>getRemovedByCUID</h5>
+<h6>Return the objects from the "removed" array by CUID, you can return in two ways:</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+// #1 - Item without link from the source (extended).
+var person = people.getRemovedByCUID('ci3zb3v2k00003255tdncj0qu');
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+person.name = 'Jhon'; // It changes the person object but not the source
+// Object {name: "Jhon", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+// Source people.getAll() still without changes
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+
+// #2 - Item linked to the source (not extended).
+var person = people.getRemovedByCUID('ci3zb3v2k00003255tdncj0qu', false);
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+person.name = 'Jhon'; // It changes the person object AND the source
+// Object {name: "Jhon", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+// Source people.getAll() was changed
+// Object {name: "Jhon", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+```
+
+<h5>recoverRemovedByCUID</h5>
+<h6>Recover a "removed" object to the "live" array by CUID</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Jhon", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
+
+// Recover the removed item
+people.recoverRemovedByCUID('ci3zb3v2k00003255tdncj0qu');
+
+people.getAll();
+// Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "recovered"}
+
 ```

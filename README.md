@@ -147,6 +147,41 @@ people.filter(function (x) { return x.name == 'Mary' && x.age == 22; });
 // Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
 
 ```
+
+<h5>map</h5>
+<h6>Return the mapped objects from the "live" array where the Lambda criteria matches</h6>
+```javascript
+people.getAll();
+// Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "new"}
+// Object {name: "Carlos", age: 22, cuid: "ci41iswtg00013253a9u7dzo5", status: "new"}
+// Object {name: "Carlos", age: 31, cuid: "ci41iswtg00023253fzru2c0a", status: "new"}
+
+people.map(function (x) { return x.name; });
+// ["Steven", "Carlos", "Carlos"]
+
+people.map(function (x) { return { key: x.cuid, value: x.name }; })
+// Object {key: "ci41iswtf000032536id8deb1", value: "Steven"}
+// Object {key: "ci41iswtg00013253a9u7dzo5", value: "Carlos"}
+// Object {key: "ci41iswtg00023253fzru2c0a", value: "Carlos"}
+
+```
+
+<h5>uniqueProp</h5>
+<h6>Return the unique values from the "live" objects by a property name</h6>
+```javascript
+people.getAll();
+// Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "new"}
+// Object {name: "Carlos", age: 22, cuid: "ci41iswtg00013253a9u7dzo5", status: "new"}
+// Object {name: "Carlos", age: 31, cuid: "ci41iswtg00023253fzru2c0a", status: "new"}
+
+people.uniqueProp('name');
+// ["Steven", "Carlos"]
+
+people.uniqueProp('status');
+// ["new"]
+
+```
+
 <h5>getByCUID</h5>
 <h6>Return the objects from the "live" array by CUID, you can return in two ways:</h6>
 ```javascript
@@ -271,6 +306,41 @@ people.filterRemoved(function (x) { return x.name == 'Mary' && x.age == 22; });
 // Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "removed"}
 
 ```
+<h5>mapRemoved</h5>
+<h6>Return the mapped objects from the "removed" array where the Lambda criteria matches</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "removed"}
+// Object {name: "Carlos", age: 22, cuid: "ci41iswtg00013253a9u7dzo5", status: "removed"}
+// Object {name: "Carlos", age: 31, cuid: "ci41iswtg00023253fzru2c0a", status: "removed"}
+
+people.mapRemoved(function (x) { return x.name; });
+// ["Steven", "Carlos", "Carlos"]
+
+people.mapRemoved(function (x) { return { key: x.cuid, value: x.name }; })
+// Object {key: "ci41iswtf000032536id8deb1", value: "Steven"}
+// Object {key: "ci41iswtg00013253a9u7dzo5", value: "Carlos"}
+// Object {key: "ci41iswtg00023253fzru2c0a", value: "Carlos"}
+
+```
+
+<h5>uniquePropRemoved</h5>
+<h6>Return the unique values from the "removed" objects by a property name</h6>
+```javascript
+people.getAllRemoved();
+// Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "removed"}
+// Object {name: "Carlos", age: 22, cuid: "ci41iswtg00013253a9u7dzo5", status: "removed"}
+// Object {name: "Carlos", age: 31, cuid: "ci41iswtg00023253fzru2c0a", status: "removed"}
+
+people.uniquePropRemoved('name');
+// ["Steven", "Carlos"]
+
+people.uniquePropRemoved('status');
+// ["removed"]
+
+```
+
+
 <h5>destroyRemovedByCUID</h5>
 <h6>Destroy a "removed" object by CUID, the item will not be accessible anymore</h6>
 ```javascript
@@ -386,6 +456,27 @@ people.serverSendFilter('/item', function(x) { return x.name == 'Steven'; });
 // As JSON Array
 people.serverSendFilter('/item', function(x) { return x.name == 'Steven'; }, true);
 // "{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"}"
+
+```
+
+<h5>serverSendAllMap</h5>
+<h6>Send "live" and "removed" Objects to the server when the map criteria match, it could be JSON or JS Array</h6>
+```javascript
+// default: method: post | async: false
+
+// As JS Array
+people.serverSendAllMap('/item', function(x) { return x.name; });
+// "{"data":["Martha","Tanya","Steven","Carlos","Carlos"]}"
+
+people.serverSendAllMap('/item', function(x) { return {name: x.name }; });
+// "{"data":[{"name":"Martha"},{"name":"Tanya"},{"name":"Steven"},{"name":"Carlos"},{"name":"Carlos"}]}"
+
+// As JSON Array
+people.serverSendAllMap('/item', function(x) { return x.name; }, true);
+// "{"Martha","Tanya","Steven","Carlos","Carlos"}"
+
+people.serverSendAllMap('/item', function(x) { return {name: x.name }; }, true);
+// "{ '{"name":"Martha"},{"name":"Tanya"},{"name":"Steven"},{"name":"Carlos"},{"name":"Carlos"}': '' }"
 
 ```
 

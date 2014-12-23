@@ -81,7 +81,7 @@ people.add(friends);
 
 <h5>getAll</h5>
 <h6>Return all the "live" array objects</h6>
-`Params: getAll: function getAll(fun)`
+`Params: getAll(fun)`
 ```javascript
 people.getAll();
 // [Object, Object, ...]

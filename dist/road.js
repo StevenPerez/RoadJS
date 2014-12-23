@@ -90,6 +90,10 @@ var road = function road()
 						
 						// Add the Object
 						data.push(copiedObject);
+						
+						// OK Callback
+						if(typeof(fun.ok) == "function")
+							fun.ok(copiedObject);
 					}
 				}
 				else
@@ -102,22 +106,40 @@ var road = function road()
 					// Clone Extended Object
 					var copiedObject = {};
 					$.extend(copiedObject, obj);
-
+					
 					// Add the Object
 					data.push(copiedObject);
+					
+					// OK Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(copiedObject);
 				}
-									
+				
 				// Return Object
 				if (fun.sendBack)
 					return obj;
+				
+				// END Callback
+				if(typeof(fun.end) == "function")
+					fun.end(obj);
+				
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 				
-		remove: function remove(cuid) {
+		remove: function remove(cuid, fun) {
 			try
 			{
+				// Initialize
+				fun = fun || {};
+				
 				// Check if a cuid was passed
 				validateCUID(cuid);
 				
@@ -141,16 +163,34 @@ var road = function road()
 					
 					// Remove the Item
 					data.splice(removeIndex, 1);
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(objRemoved);
 				}
 				else
 					return null;
+				
+				// END Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
-			catch(err)
-			{ throw err; }
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		update: function update(obj, cuid) {
+		update: function update(obj, cuid, fun) {
 			try {
+				
+				// Initialize
+				fun = fun || {};
+				
 				// Validations
 				if (!obj)
 					throw 'Missing object';
@@ -187,6 +227,10 @@ var road = function road()
 						// Update the properties between Source and Destination
 						updateProperties(obj[i], objData);
 						objData.status = 'changed';
+						
+						// Ok Callback
+						if(typeof(fun.ok) == "function")
+							fun.ok(objData);
 					}
 				}
 				else
@@ -211,15 +255,32 @@ var road = function road()
 					// Change Status and reinforce the cuid item
 					objData.cuid = cuid.toString();
 					objData.status = 'changed';
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(objData);
 				}
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 				
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		delete: function del(cuid) {
+		delete: function del(cuid, fun) {
 			try {
+
+				// Initialize
+				fun = fun || {};
 				
 				validateCUID(cuid);
 
@@ -233,33 +294,84 @@ var road = function road()
 				// Change Status and reinforce the cuid item				
 				obj.cuid 	=  cuid;
 				obj.status 	= 'deleted';
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(obj);
 
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
-			},
-		
-		setData: function setData(newData) {
-			try
 			{
-				data = [];
-				data = this.add(newData, { sendBack: true}, 'origin');
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
 			}
-			catch(err)
-			{ throw err; }
 		},
 		
-		getAll: function getAll() {
+		setData: function setData(newData, fun) {
+			try
+			{
+				// Initialize
+				fun = fun || {};
+				
+				data = [];
+				data = this.add(newData, { sendBack: true}, 'origin');
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(data);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+			}
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
+		},
+		
+		getAll: function getAll(fun) {
 			try {
+				
+				// Initialize
+				fun = fun || {};
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(data);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				return data;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		getByCUID: function getByCUID(cuid, isClone) {
+		getByCUID: function getByCUID(cuid, isClone, fun) {
 			try
-			{					
+			{
+				// Initialize
+				fun = fun || {};
+				
 				// If it is undefined then create a Clone of the
 				// returned object
 				if (isClone == undefined) { isClone = true; }
@@ -280,25 +392,70 @@ var road = function road()
 					var Clone = {};
 					$.extend(Clone, result);
 					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(Clone);
+					
+					// End Callback
+					if(typeof(fun.end) == "function")
+						fun.end();
+					
 					return Clone;
 				}
 				else
-					return result;
+				{
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(result);
 				
+					// End Callback
+					if(typeof(fun.end) == "function")
+						fun.end();
+					
+					return result;
+				}
 			}
-			catch(err) { return err; }
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		length: function length() {
+		length: function length(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(data.length);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				return data.length;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		filter: function filter(criteria) {
+		filter: function filter(criteria, fun) {
 			try {
+				
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				// Create a clone in case of bad request
@@ -308,31 +465,70 @@ var road = function road()
 				// Find items
 				dataClone.forEach(function (item) {
 					if (criteria(item))
+					{
+						// Ok Callback
+						if(typeof(fun.ok) == "function")
+							fun.ok(item);
+						
 						result.push(item);
+					}
 				});
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end(result);
 				
 				return result;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		map: function map(criteria) {
+		map: function map(criteria, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				// Create a clone in case of bad request
 				var dataClone = [];
 				$.extend(dataClone, data);
+			
+				// New object mapped
+				var newObj = dataClone.map(criteria);
 				
-				return dataClone.map(criteria);
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(newObj);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
+				return newObj;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		uniqueProp: function uniqueProp(property) {
+		uniqueProp: function uniqueProp(property, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				if (property == undefined)
@@ -345,24 +541,61 @@ var road = function road()
 				var dataClone = [];
 				$.extend(dataClone, data);
 				
-				return dataClone.map(function (x) { return x[property] }).distinct();
+				// Create new unique object
+				var newObj = dataClone.map(function (x) { return x[property] }).distinct();
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(newObj);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
+				return newObj;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// >> Removed Items
-		getAllRemoved: function getAllRemoved() {
+		getAllRemoved: function getAllRemoved(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(dataRemoved);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				return dataRemoved;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		getRemovedByCUID: function getRemovedByCUID(cuid, isClone) {
+		getRemovedByCUID: function getRemovedByCUID(cuid, isClone, fun) {
 			try	
 			{	
+				// Initialize
+				fun = fun || {};
+				
 				// If it is undefined then create a Clone of the
 				// returned object
 				if (isClone == undefined) { isClone = true; }
@@ -383,34 +616,95 @@ var road = function road()
 					var Clone = {};
 					$.extend(Clone, result);
 
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(Clone);
+
+					// End Callback
+					if(typeof(fun.end) == "function")
+						fun.end();
+					
 					return Clone;
 				}
 				else
-					return result;
+				{
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(result);
 
+					// End Callback
+					if(typeof(fun.end) == "function")
+						fun.end();
+					
+					return result;
+				}
 			}
-			catch(err) { return err; }
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		cleanRemoved: function cleanRemoved() {
+		cleanRemoved: function cleanRemoved(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok();
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				dataRemoved = [];
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		lengthRemoved: function lengthRemoved() {
+		lengthRemoved: function lengthRemoved(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(dataRemoved.length);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				return dataRemoved.length;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		destroyRemovedByCUID: function destroyRemovedByCUID(cuid) {
+		destroyRemovedByCUID: function destroyRemovedByCUID(cuid, fun) {
 			try
 			{
+				// Initialize
+				fun = fun || {};
+				
 				// Check if a cuid was passed
 				validateCUID(cuid);
 				
@@ -431,13 +725,30 @@ var road = function road()
 				}
 				else
 					return null;
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(removeIndex);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 			}
-			catch(err)
-			{ throw err; }
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		recoverRemovedByCUID: function recoverRemovedByCUID(cuid) {
+		recoverRemovedByCUID: function recoverRemovedByCUID(cuid, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
 				
 				// Check if a cuid was passed
 				validateCUID(cuid);
@@ -458,30 +769,65 @@ var road = function road()
 				
 				// Remove item from the Removed list
 				this.destroyRemovedByCUID(cuid);
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(objRecover);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		recoverAllRemoved: function recoverAllRemoved() {
+		recoverAllRemoved: function recoverAllRemoved(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
 				
 				// Check if a cuid was not passed
 				if (this.lengthRemoved() == 0)
 					throw 'No data in memory';
 
 				for (var i = 0; i < this.lengthRemoved(); i++)
+				{
 					this.add(dataRemoved[i], null, 'recovered');
-
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(dataRemoved[i]);
+				}
+				
 				// Clean the Removed list
 				this.cleanRemoved();
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		filterRemoved: function filterRemoved(criteria) {
+		filterRemoved: function filterRemoved(criteria, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				// Create a clone in case of bad request
@@ -491,31 +837,69 @@ var road = function road()
 				// Find items
 				dataClone.forEach(function (item) {
 					if (criteria(item))
+					{
+						// Ok Callback
+						if(typeof(fun.ok) == "function")
+							fun.ok(item);
+						
 						result.push(item);
+					}
 				});
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end(result);
 				
 				return result;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		mapRemoved: function mapRemoved(criteria) {
+		mapRemoved: function mapRemoved(criteria, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				// Create a clone in case of bad request
 				var dataClone = [];
 				$.extend(dataClone, dataRemoved);
 				
-				return dataClone.map(criteria);
+				var newObj = dataClone.map(criteria);
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(newObj);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
+				return newObj;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		uniquePropRemoved: function uniquePropRemoved(property) {
+		uniquePropRemoved: function uniquePropRemoved(property, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var result = [];
 				
 				if (property == undefined)
@@ -528,10 +912,27 @@ var road = function road()
 				var dataClone = [];
 				$.extend(dataClone, dataRemoved);
 				
-				return dataClone.map(function (x) { return x[property] }).distinct();
+				// New unique object
+				var newObj = dataClone.map(function (x) { return x[property] }).distinct();
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(newObj);
+				
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
+				return newObj;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// 				>>> Local Storage <<<
@@ -540,28 +941,55 @@ var road = function road()
 		isLocalStorageSupported: function isLocalStorageSupported() {
 			try {
 				return 'localStorage' in window && window['localStorage'] !== null;
-			} catch (e) 
-			{ return false; }
+			} 
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// Save in Local Storage
-		saveLocalStorage: function saveLocalStorage() {
+		saveLocalStorage: function saveLocalStorage(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				if (this.isLocalStorageSupported())
 				{
 					localStorage['live'] = JSON.stringify(data);
 					localStorage['removed'] = JSON.stringify(dataRemoved);
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok();
 				}
 				else
 					throw 'No local storage supported.'
+					
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// Load from Local Storage
-		loadLocalStorage: function loadLocalStorage() {
+		loadLocalStorage: function loadLocalStorage(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				if (this.isLocalStorageSupported())
 				{
 					data = [];
@@ -569,34 +997,68 @@ var road = function road()
 					
 					data = JSON.parse(localStorage['live']);
 					dataRemoved = JSON.parse(localStorage['removed']);
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok();
 				}
 				else
 					throw 'No local storage supported.'
+					
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// Clean Local Storage
-		cleanLocalStorage: function cleanLocalStorage() {
+		cleanLocalStorage: function cleanLocalStorage(fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				if (this.isLocalStorageSupported())
 				{
 					localStorage['live'] = null;
 					localStorage['removed'] = null;
+					
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok();
 				}
 				else
 					throw 'No local storage supported.'
+					
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 		// 				>>> Ajax Requests <<<
 		
 		// Load data through non-async request
-		serverLoad: function serverLoad(ajaxUrl) {
+		serverLoad: function serverLoad(ajaxUrl, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Validate there are params
@@ -622,14 +1084,30 @@ var road = function road()
 				if (dataAnalysis) {	
 					this.add(dataAnalysis, {}, 'origin');
 				}
+				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(dataAnalysis);
 
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 			}
-			catch(err)
-			{ throw err; }
+			catch (err)
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		serverSendAll: function serverSendAll(ajaxUrl, isJSON) {
+		serverSendAll: function serverSendAll(ajaxUrl, isJSON, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Initialize isJSON
@@ -656,15 +1134,32 @@ var road = function road()
 				// Send and Get Ajax Response
 				var reponseAjax = $.ajax(ajaxParams).responseText;
 				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(reponseAjax);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				// If it is JSON convert to JS Array
 				return reponseAjax;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		serverSendAllMap: function serverSendAll(ajaxUrl, criteria, isJSON) {
+		serverSendAllMap: function serverSendAll(ajaxUrl, criteria, isJSON, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Initialize isJSON
@@ -698,15 +1193,32 @@ var road = function road()
 				// Send and Get Ajax Response
 				var reponseAjax = $.ajax(ajaxParams).responseText;
 				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(reponseAjax);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				// If it is JSON convert to JS Array
 				return reponseAjax;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		serverSendAllRemoved: function serverSendAllRemoved(ajaxUrl, isJSON) {
+		serverSendAllRemoved: function serverSendAllRemoved(ajaxUrl, isJSON, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Initialize isJSON
@@ -732,16 +1244,33 @@ var road = function road()
 				
 				// Send and Get Ajax Response
 				var reponseAjax = $.ajax(ajaxParams).responseText;
+
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(reponseAjax);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
 				
 				// If it is JSON convert to JS Array
 				return reponseAjax;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		serverSendFilter: function serverSendFilter(ajaxUrl, criteria, isJSON) {
+		serverSendFilter: function serverSendFilter(ajaxUrl, criteria, isJSON, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Initialize isJSON
@@ -777,15 +1306,32 @@ var road = function road()
 				// Send and Get Ajax Response
 				var reponseAjax = $.ajax(ajaxParams).responseText;
 				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(reponseAjax);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end();
+				
 				// If it is JSON convert to JS Array
 				return reponseAjax;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
-		serverSendByCUID: function serverSendByCUID(cuid, ajaxUrl, isJSON) {
+		serverSendByCUID: function serverSendByCUID(cuid, ajaxUrl, isJSON, fun) {
 			try {
+				// Initialize
+				fun = fun || {};
+				
 				var ajaxParams = {};
 				
 				// Check if a cuid was passed
@@ -821,11 +1367,25 @@ var road = function road()
 				// Send and Get Ajax Response
 				var reponseAjax = $.ajax(ajaxParams).responseText;
 				
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(objToSend, reponseAjax);
+
+				// End Callback
+				if(typeof(fun.end) == "function")
+					fun.end(reponseAjax);
+				
 				// If it is JSON convert to JS Array
 				return reponseAjax;
 			}
 			catch (err)
-			{ throw err; }
+			{
+				// ERROR Callback
+				if(typeof(fun.err) == "function")
+					fun.err(err);
+				
+				throw err; 
+			}
 		},
 		
 	};

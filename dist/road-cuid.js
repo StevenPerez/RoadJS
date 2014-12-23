@@ -146,6 +146,24 @@ var road = function road()
 			throw 'Missing cuid';
 	}
 	
+	// Extend Array to get Unique values
+	Array.prototype.distinct = function() {
+	  var b = [this[0]], i, j, tmp;
+	  for (i = 1; i < this.length; i++) {
+		tmp = 1;
+		for (j = 0; j < b.length; j++) {
+		  if (this[i] == b[j]) {
+			tmp = 0;
+			break;
+		  }
+		}
+		if (tmp) {
+		  b.push(this[i]);
+		}
+	  }
+	  return b;
+	}
+	
 	return {
 		
 		// 						>>> Memory Methods <<<
@@ -411,6 +429,40 @@ var road = function road()
 			{ throw err; }
 		},
 		
+		map: function map(criteria) {
+			try {
+				var result = [];
+				
+				// Create a clone in case of bad request
+				var dataClone = [];
+				$.extend(dataClone, data);
+				
+				return dataClone.map(criteria);
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		uniqueProp: function uniqueProp(property) {
+			try {
+				var result = [];
+				
+				if (property == undefined)
+					throw 'Missing property name.';
+				
+				if (typeof(property) != 'string' || property.length == 0)
+					throw 'Property name should be String';
+				
+				// Create a clone in case of bad request
+				var dataClone = [];
+				$.extend(dataClone, data);
+				
+				return dataClone.map(function (x) { return x[property] }).distinct();
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
 		// >> Removed Items
 		getAllRemoved: function getAllRemoved() {
 			try {
@@ -560,6 +612,40 @@ var road = function road()
 			{ throw err; }
 		},
 		
+		mapRemoved: function mapRemoved(criteria) {
+			try {
+				var result = [];
+				
+				// Create a clone in case of bad request
+				var dataClone = [];
+				$.extend(dataClone, dataRemoved);
+				
+				return dataClone.map(criteria);
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		uniquePropRemoved: function uniquePropRemoved(property) {
+			try {
+				var result = [];
+				
+				if (property == undefined)
+					throw 'Missing property name.';
+				
+				if (typeof(property) != 'string' || property.length == 0)
+					throw 'Property name should be String';
+				
+				// Create a clone in case of bad request
+				var dataClone = [];
+				$.extend(dataClone, dataRemoved);
+				
+				return dataClone.map(function (x) { return x[property] }).distinct();
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
 		// 				>>> Local Storage <<<
 		
 		// Check if Local Storage is Supported
@@ -674,6 +760,48 @@ var road = function road()
 					ajaxParams.data = { 'data': data };
 				else
 					ajaxParams.data = JSON.stringify(data);
+				
+				ajaxParams.async = false;
+				ajaxParams.method = 'POST';
+				ajaxParams.url = ajaxUrl;
+				
+				// Send and Get Ajax Response
+				var reponseAjax = $.ajax(ajaxParams).responseText;
+				
+				// If it is JSON convert to JS Array
+				return reponseAjax;
+			}
+			catch (err)
+			{ throw err; }
+		},
+		
+		serverSendAllMap: function serverSendAll(ajaxUrl, criteria, isJSON) {
+			try {
+				var ajaxParams = {};
+				
+				// Initialize isJSON
+				if (isJSON == undefined) { isJSON = false; }
+				
+				// Validate there are params
+				if (!ajaxUrl)
+					throw 'Missing ajax url parameter';
+				
+				if (!data || data == [] && !dataRemoved || dataRemoved == [])
+					throw 'No data found.';
+					
+				// -----------------------------------------------------------
+				
+				var objFiltered = [];
+				
+				this.filter(criteria).forEach( function(item){ objFiltered.push(item); });
+				this.filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
+				
+				// -----------------------------------------------------------
+				
+				if (isJSON == false)
+					ajaxParams.data = { 'data': objFiltered.map(criteria) };
+				else
+					ajaxParams.data = JSON.stringify(objFiltered.map(criteria));
 				
 				ajaxParams.async = false;
 				ajaxParams.method = 'POST';

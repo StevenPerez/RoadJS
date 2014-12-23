@@ -40,6 +40,17 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <strong>status:recovered -</strong> it refers when you use the road.recoverRemovedByCUID(CUID) / road.recoverAllRemoved() methods, it recovers the item from the <strong>dataRemoved</strong> "trash" Array to the "live" <strong>data</strong> array in memory.
 
 <br />
+<h3>Road Callback</h3>
+<h6>The 99.9% of the functions contains an object to track callbacks.</h6>
+<strong>fun</strong> parameter contains 3 callback methods: 
+<br />
+<ul>
+	<li>fun.ok : Callback for each item(s) once the action is completed, most of the time, it is inside of the loops</li>
+	<li>fun.end : Callback before the last return, so it skip the loops</li>
+	<li>fun.err : Callback in case of error and before the throw</li>
+</ul>
+
+<br />
 <h3>Road Methods</h3>
 
 ```javascript

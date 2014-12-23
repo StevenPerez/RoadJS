@@ -348,7 +348,7 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		lengthRemoved: function length() {
+		lengthRemoved: function lengthRemoved() {
 			try {
 				return dataRemoved.length;
 			}
@@ -451,7 +451,7 @@ var road = function road()
 		// 				>>> Local Storage <<<
 		
 		// Check if Local Storage is Supported
-		isLocalStorageSupported: function supportsLocalStorage() {
+		isLocalStorageSupported: function isLocalStorageSupported() {
 			try {
 				return 'localStorage' in window && window['localStorage'] !== null;
 			} catch (e) 
@@ -509,7 +509,7 @@ var road = function road()
 		// 				>>> Ajax Requests <<<
 		
 		// Load data through non-async request
-		serverLoad: function load(ajaxUrl) {
+		serverLoad: function serverLoad(ajaxUrl) {
 			try {
 				var ajaxParams = {};
 				
@@ -577,7 +577,7 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		serverSendAllRemoved: function serverSendAll(ajaxUrl, isJSON) {
+		serverSendAllRemoved: function serverSendAllRemoved(ajaxUrl, isJSON) {
 			try {
 				var ajaxParams = {};
 				
@@ -612,7 +612,7 @@ var road = function road()
 			{ throw err; }
 		},
 		
-		serverSendFilter: function serverSendAll(ajaxUrl, criteria, isJSON) {
+		serverSendFilter: function serverSendFilter(ajaxUrl, criteria, isJSON) {
 			try {
 				var ajaxParams = {};
 				

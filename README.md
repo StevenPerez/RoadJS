@@ -57,6 +57,7 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 // Create People
 var people = road();
 ```
+<br />
 
 <h5>add</h5>
 <h6>Add items to the "live" array</h6>
@@ -536,3 +537,64 @@ people.serverSendByCUID('ci3zcivvc00033255oi5x9fyi', '/item', true);
 // "{"name":"Steven","age":28,"id":1,"cuid":"ci3zcivvc00033255oi5x9fyi","status":"removed"}"
 
 ```
+<br />
+
+<h3>runAsync</h3>
+`Params: runAsync(fn, arguments, callback, ms)`
+<h6>Road attachs to the window object this function in order to run functions as async mode.</h6>
+```javascript
+// 		>>> Simple Example <<<
+
+// Async Callback
+function done(item)
+{
+  console.log('done -> ' + item);
+}
+
+runAsync(people.add, [ { name: 'Marc', age: 30}], done);
+
+//Console output
+// done -> undefined // because I didn't include the add arguments to return the added object but done was executed
+
+
+
+// 		>>> Advance Example <<<
+
+// Async Callback
+function done(item)
+{
+  console.log('done -> ' + item);
+}
+
+// add method Callback
+function addCallback(item)
+{
+  console.log('addCallback -> ' + item);
+}
+
+//Double Callback Async Execution
+runAsync(people.add, 
+		// Arguments
+		[
+			// Object or Array to Add
+			{ 
+				name: 'Marc', age: 30
+			},
+			// Params of function
+		  	{ 
+		   		sendBack: true, 	// Return the last object added
+				ok: addCallback 	// Return for each item added
+		  	}
+
+       		],
+ 		  // Async Callback
+ 		  done,
+ 		  // setTimeout ms
+ 		  3
+	);
+
+// Console Output
+// addCallback -> [object Object]
+// done -> [object Object]
+```
+<br />

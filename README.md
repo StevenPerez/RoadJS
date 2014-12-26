@@ -539,7 +539,7 @@ people.serverSendByCUID('ci3zcivvc00033255oi5x9fyi', '/item', true);
 ```
 <br />
 
-<h3>runAsync</h3>
+<h4>runAsync</h4>
 `Params: runAsync(fn, arguments, callback, ms)`
 <h6>Road attachs to the window object this function in order to run functions as async mode.</h6>
 ```javascript

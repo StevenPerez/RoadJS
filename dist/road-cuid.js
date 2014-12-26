@@ -183,6 +183,16 @@ var road = function road()
 		return newArray;
 	}
 	
+	window.runAsync = function(fn, arguments, callback, ms){
+			// Save Params
+			var run = { fn: fn, arguments: arguments, callback: callback };
+			// Execute Async
+			setTimeout(function asyncF(){
+				run.callback = run.callback || function () {};
+				run.callback(run.fn.apply(undefined, run.arguments));
+			}, (ms == undefined) ? 0 : ms);
+	}
+	
 	return {
 		
 		// 						>>> Memory Methods <<<

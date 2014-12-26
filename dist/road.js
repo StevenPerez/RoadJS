@@ -56,19 +56,16 @@ var road = function road()
 		
 		var newArray = JSON.stringify(this);
 		newArray = JSON.parse(newArray);
+		var strCollection = JSON.stringify(this);
 
-		this.forEach(function(item) { 
-
-			var check = newArray.filter(function (x) { return JSON.stringify(x) === JSON.stringify(item); });
-			if (check.length > 1)
-			{
-				for (var i = 0; i < check.length - 1; i++)
-				{
-					var index = newArray.indexOf(check[i]);
-					newArray.splice(index, 1);
-				}
-			}
-
+		newArray.forEach(function(item) { 
+			
+			var indexFirst = strCollection.indexOf(JSON.stringify(item));
+			var indexOther = strCollection.indexOf(JSON.stringify(item), indexFirst + JSON.stringify(item).length)
+			
+			if (indexOther > -1)
+				newArray.splice(newArray.indexOf(item), 1);
+			
 		});
 
 		return newArray;

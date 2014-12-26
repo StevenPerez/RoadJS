@@ -40,6 +40,17 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 <strong>status:recovered -</strong> it refers when you use the road.recoverRemovedByCUID(CUID) / road.recoverAllRemoved() methods, it recovers the item from the <strong>dataRemoved</strong> "trash" Array to the "live" <strong>data</strong> array in memory.
 
 <br />
+<h3>Road Callback</h3>
+<h6>The 99.9% of the functions contains an object to track callbacks.</h6>
+<strong>fun</strong> parameter contains 3 callback methods: 
+<br />
+<ul>
+	<li>fun.ok : Callback for each item(s) once the action is completed, most of the time, it is inside of the loops</li>
+	<li>fun.end : Callback before the last return, so it skip the loops</li>
+	<li>fun.err : Callback in case of error and before the throw</li>
+</ul>
+
+<br />
 <h3>Road Methods</h3>
 
 ```javascript
@@ -49,6 +60,7 @@ var people = road();
 
 <h5>add</h5>
 <h6>Add items to the "live" array</h6>
+`Params: add(obj, fun, status)`
 ```javascript
 people.add({ name: 'Steven', age: 28 });
 // undefined
@@ -69,12 +81,14 @@ people.add(friends);
 
 <h5>getAll</h5>
 <h6>Return all the "live" array objects</h6>
+`Params: getAll(fun)`
 ```javascript
 people.getAll();
 // [Object, Object, ...]
 ```
 <h5>remove</h5>
 <h6>Move an object from "live" array to "removed" array</h6>
+`Params: remove(cuid, fun)`
 ```javascript
   people.getAll();
   // Object {name: "Eric", age: 22, cuid: "ci3ytv6xk000032534caqjx6o", status: "new"} => Remove This
@@ -91,6 +105,7 @@ people.getAll();
 ```
 <h5>update</h5>
 <h6>Update properties to a "live" object</h6>
+`Params: update(obj, cuid, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Carlos", age: 22, cuid: "ci3yuixr900003255e4eh1u7o", status: "new"}
@@ -105,6 +120,7 @@ people.update({name: 'Duck', cuid: 'ci3yuixr900003255e4eh1u7o'}); // same result
 
 <h5>delete</h5>
 <h6>Change the status to deleted in an Object</h6>
+`Params: del(cuid, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Carlos", age: 22, cuid: "ci3yus8oa00003255mm0bzo0w", status: "new"}
@@ -116,6 +132,7 @@ people.delete('ci3yus8oa00003255mm0bzo0w');
 ```
 <h5>setData</h5>
 <h6>Replace the "live" array for another one</h6>
+`Params: setData(newData, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Carlos", age: 24, cuid: "ci3yus8oa00003255mm0bzo0w", status: "new"}
@@ -135,6 +152,7 @@ people.setData(friends);
 ```
 <h5>length</h5>
 <h6>Returns the length of the "live" array</h6>
+`Params: length(fun)`
 ```javascript
 people.length();
 // 3
@@ -142,6 +160,7 @@ people.length();
 ```
 <h5>filter</h5>
 <h6>Return the objects from the "live" array where the Lambda criteria matches</h6>
+`Params: filter(criteria, fun)`
 ```javascript
 people.filter(function (x) { return x.name == 'Mary' && x.age == 22; });
 // Object {name: "Mary", age: 22, cuid: "ci3zab93h000232554wzxkji5", status: "origin"}
@@ -150,6 +169,7 @@ people.filter(function (x) { return x.name == 'Mary' && x.age == 22; });
 
 <h5>map</h5>
 <h6>Return the mapped objects from the "live" array where the Lambda criteria matches</h6>
+`Params: map(criteria, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "new"}
@@ -168,6 +188,7 @@ people.map(function (x) { return { key: x.cuid, value: x.name }; })
 
 <h5>uniqueProp</h5>
 <h6>Return the unique values from the "live" objects by a property name</h6>
+`Params: uniqueProp(property, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "new"}
@@ -184,6 +205,7 @@ people.uniqueProp('status');
 
 <h5>getByCUID</h5>
 <h6>Return the objects from the "live" array by CUID, you can return in two ways:</h6>
+`Params: getByCUID(cuid, isClone, fun)`
 ```javascript
 people.getAll();
 // Object {name: "Carlos", age: 22, cuid: "ci3zab93d00003255zxg3x2cj", status: "origin"}
@@ -214,6 +236,7 @@ person.name = 'Jhon'; // It changes the person object AND the source
 
 <h5>getAllRemoved</h5>
 <h6>Returns all the objects from the "removed" array</h6>
+`Params: getAllRemoved(fun)`
 ```javascript
 
 people.getAll();
@@ -228,6 +251,7 @@ people.getAllRemoved();
 
 <h5>lengthRemoved</h5>
 <h6>Returns the length of the "removed" array</h6>
+`Params: lengthRemoved(fun)`
 ```javascript
 people.lengthRemoved();
 // 1
@@ -236,6 +260,7 @@ people.lengthRemoved();
 
 <h5>cleanRemoved</h5>
 <h6>Initialize with an empty "removed" array</h6>
+`Params: cleanRemoved(fun)`
 ```javascript
 people.cleanRemoved();
 // []
@@ -244,6 +269,7 @@ people.cleanRemoved();
 
 <h5>getRemovedByCUID</h5>
 <h6>Return the objects from the "removed" array by CUID, you can return in two ways:</h6>
+`Params: getRemovedByCUID(cuid, isClone, fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Carlos", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
@@ -270,6 +296,7 @@ person.name = 'Jhon'; // It changes the person object AND the source
 
 <h5>recoverRemovedByCUID</h5>
 <h6>Recover a "removed" object to the "live" array by CUID</h6>
+`Params: recoverRemovedByCUID(cuid, fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Jhon", age: 22, cuid: "ci3zb3v2k00003255tdncj0qu", status: "removed"}
@@ -283,6 +310,7 @@ people.getAll();
 ```
 <h5>recoverAllRemoved</h5>
 <h6>Recover All the "removed" objects to the "live" array</h6>
+`Params: recoverAllRemoved(fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
@@ -301,6 +329,7 @@ people.getAll();
 
 <h5>filterRemoved</h5>
 <h6>Return the objects from the "removed" array where the Lambda criteria matches</h6>
+`Params: filterRemoved(criteria, fun)`
 ```javascript
 people.filterRemoved(function (x) { return x.name == 'Mary' && x.age == 22; });
 // Object {name: "Mary", age: 22, cuid: "ci3zbod4n00023255ou8ldbtu", status: "removed"}
@@ -308,6 +337,7 @@ people.filterRemoved(function (x) { return x.name == 'Mary' && x.age == 22; });
 ```
 <h5>mapRemoved</h5>
 <h6>Return the mapped objects from the "removed" array where the Lambda criteria matches</h6>
+`Params: mapRemoved(criteria, fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "removed"}
@@ -326,6 +356,7 @@ people.mapRemoved(function (x) { return { key: x.cuid, value: x.name }; })
 
 <h5>uniquePropRemoved</h5>
 <h6>Return the unique values from the "removed" objects by a property name</h6>
+`Params: uniquePropRemoved(property, fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Steven", age: 28, cuid: "ci41iswtf000032536id8deb1", status: "removed"}
@@ -343,6 +374,7 @@ people.uniquePropRemoved('status');
 
 <h5>destroyRemovedByCUID</h5>
 <h6>Destroy a "removed" object by CUID, the item will not be accessible anymore</h6>
+`Params: destroyRemovedByCUID(cuid, fun)`
 ```javascript
 people.getAllRemoved();
 // Object {name: "Carlos", age: 22, cuid: "ci3zbod4i00003255fapsw2o4", status: "removed"}
@@ -363,6 +395,7 @@ people.getAllRemoved();
 
 <h5>isLocalStorageSupported</h5>
 <h6>Returns if the current web browser supports local storage</h6>
+`Params: isLocalStorageSupported()`
 ```javascript
 people.isLocalStorageSupported();
 // true / false
@@ -370,6 +403,7 @@ people.isLocalStorageSupported();
 
 <h5>saveLocalStorage</h5>
 <h6>Saves the "live" and "removed" items into the local storage</h6>
+`Params: saveLocalStorage(fun)`
 ```javascript
 people.saveLocalStorage();
 
@@ -377,6 +411,7 @@ people.saveLocalStorage();
 
 <h5>loadLocalStorage</h5>
 <h6>Load the "live" and "removed" objects into the road's arrays</h6>
+`Params: loadLocalStorage(fun)`
 ```javascript
 // Load from local storage
 people.loadLocalStorage();
@@ -390,6 +425,7 @@ people.getAllRemoved();
 
 <h5>cleanLocalStorage</h5>
 <h6>Clean the local storage memory</h6>
+`Params: cleanLocalStorage(fun)`
 ```javascript
 
 people.cleanLocalStorage();
@@ -401,6 +437,7 @@ people.cleanLocalStorage();
 
 <h5>serverLoad</h5>
 <h6>Call a GET verb to a url and then load the "live" array, it could be JSON or JS Array</h6>
+`Params: serverLoad(ajaxUrl, fun)`
 ```javascript
 
 // default: method: get | async: false
@@ -415,6 +452,7 @@ people.getAll();
 
 <h5>serverSendAll</h5>
 <h6>Send "live" array to the server, it could be JSON or JS Array</h6>
+`Params: serverSendAll(ajaxUrl, isJSON, fun)`
 ```javascript
 
 // default: method: post | async: false
@@ -431,6 +469,7 @@ people.serverSendAll('/items', true);
 
 <h5>serverSendAllRemoved</h5>
 <h6>Send "removed" array to the server, it could be JSON or JS Array</h6>
+`Params: serverSendAllRemoved(ajaxUrl, isJSON, fun)`
 ```javascript
 // default: method: post | async: false
 
@@ -446,6 +485,7 @@ people.serverSendAllRemoved('/items', true);
 
 <h5>serverSendFilter</h5>
 <h6>Send "live" and "removed" Objects to the server when the filter criteria match, it could be JSON or JS Array</h6>
+`Params: serverSendFilter(ajaxUrl, criteria, isJSON, fun)`
 ```javascript
 // default: method: post | async: false
 
@@ -461,6 +501,7 @@ people.serverSendFilter('/item', function(x) { return x.name == 'Steven'; }, tru
 
 <h5>serverSendAllMap</h5>
 <h6>Send "live" and "removed" Objects to the server when the map criteria match, it could be JSON or JS Array</h6>
+`Params: serverSendAll(ajaxUrl, criteria, isJSON, fun)`
 ```javascript
 // default: method: post | async: false
 
@@ -482,6 +523,7 @@ people.serverSendAllMap('/item', function(x) { return {name: x.name }; }, true);
 
 <h5>serverSendByCUID</h5>
 <h6>Send "live" or "removed" Object to the server when the CUID match, it could be JSON or JS Array</h6>
+`Params: serverSendByCUID(cuid, ajaxUrl, isJSON, fun)`
 ```javascript
 // default: method: post | async: false
 

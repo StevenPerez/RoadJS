@@ -52,6 +52,28 @@ var road = function road()
 	  return b;
 	}
 	
+	Array.prototype.unique = function() {
+		
+		var newArray = JSON.stringify(this);
+		newArray = JSON.parse(newArray);
+
+		this.forEach(function(item) { 
+
+			var check = newArray.filter(function (x) { return JSON.stringify(x) === JSON.stringify(item); });
+			if (check.length > 1)
+			{
+				for (var i = 0; i < check.length - 1; i++)
+				{
+					var index = newArray.indexOf(check[i]);
+					newArray.splice(index, 1);
+				}
+			}
+
+		});
+
+		return newArray;
+	}
+	
 	return {
 		
 		// 						>>> Memory Methods <<<
@@ -1387,6 +1409,15 @@ var road = function road()
 				throw err; 
 			}
 		},
+		
+		// 				>>> Test Performance <<<
+		performance: function performance(fn)
+		{
+			var start =+ new Date();
+			fn();
+			var end =  +new Date();  // log end timestamp
+	 		return end - start;
+		}
 		
 	};
 	

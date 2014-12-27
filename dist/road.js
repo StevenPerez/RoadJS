@@ -102,6 +102,33 @@ var road = function road()
 			throw 'Missing cuid';
 	}
 	
+	var observableCallback = undefined;
+	obs: function obs() {
+
+		execute: function execute(params)
+		{
+			observableCallback = observableCallback || function() {};
+			observableCallback(params);
+		}
+		
+		getObservable: function getObservable()
+		{
+			return observableCallback;
+		}
+		
+		setObservable: function setObservable(fn)
+		{
+			fn = fn || function() {};
+			observableCallback = fn;
+		}
+		
+		return {
+			execute: execute,
+			getObservable: getObservable,
+			setObservable: setObservable
+		};
+	}
+	
 	// ==========================================================================
 
 	
@@ -132,7 +159,7 @@ var road = function road()
 					for (var i = 0; i < length; i++)
 					{
 						if (status != 'recovered')
-							obj[i].cuid 		= cuid();
+							obj[i].cuid = cuid();
 						
 						obj[i].status 	= status;
 												
@@ -146,13 +173,21 @@ var road = function road()
 						// OK Callback
 						if(typeof(fun.ok) == "function")
 							fun.ok(copiedObject);
+						
+						// Observe
+						runAsync(obs().execute, [{ 
+													action: 'Added', 
+													obj: $.extend({}, copiedObject), 
+													cuid: copiedObject.cuid 
+												}]);
 					}
 				}
 				else
 				// If it is just one Object
 				{					
 					if (status != 'recovered')
-						obj.cuid 		= cuid();
+						obj.cuid 	= cuid();
+					
 					obj.status 		= status;
 										
 					// Clone Extended Object
@@ -165,6 +200,13 @@ var road = function road()
 					// OK Callback
 					if(typeof(fun.ok) == "function")
 						fun.ok(copiedObject);
+					
+					// Observe
+					runAsync(obs().execute, [{ 
+												action: 'Added', 
+												obj: $.extend({}, copiedObject), 
+												cuid: copiedObject.cuid 
+											}]);
 				}
 				
 				// Return Object
@@ -219,6 +261,13 @@ var road = function road()
 					// Ok Callback
 					if(typeof(fun.ok) == "function")
 						fun.ok(objRemoved);
+					
+					// Observe
+					runAsync(obs().execute, [{ 
+												action: 'Removed', 
+												obj: $.extend({}, objRemoved), 
+												cuid: objRemoved.cuid 
+											}]);
 				}
 				else
 					return null;
@@ -283,6 +332,13 @@ var road = function road()
 						// Ok Callback
 						if(typeof(fun.ok) == "function")
 							fun.ok(objData);
+						
+						// Observe
+						runAsync(obs().execute, [{ 
+													action: 'Updated', 
+													obj: $.extend({}, objData), 
+													cuid: objData.cuid 
+												}]);
 					}
 				}
 				else
@@ -311,6 +367,13 @@ var road = function road()
 					// Ok Callback
 					if(typeof(fun.ok) == "function")
 						fun.ok(objData);
+					
+					// Observe
+					runAsync(obs().execute, [{ 
+												action: 'Updated', 
+												obj: $.extend({}, objData), 
+												cuid: objData.cuid 
+											}]);
 				}
 				
 				// End Callback
@@ -351,6 +414,13 @@ var road = function road()
 				if(typeof(fun.ok) == "function")
 					fun.ok(obj);
 
+				// Observe
+				runAsync(obs().execute, [{ 
+											action: 'Deleted', 
+											obj: $.extend({}, obj), 
+											cuid: obj.cuid 
+										}]);
+				
 				// End Callback
 				if(typeof(fun.end) == "function")
 					fun.end();
@@ -378,6 +448,12 @@ var road = function road()
 			if(typeof(fun.ok) == "function")
 				fun.ok(data);
 
+			// Observe
+			runAsync(obs().execute, [{ 
+										action: 'Set Data', 
+										obj: $.extend({}, data), 
+										cuid: null 
+									}]);
 			// End Callback
 			if(typeof(fun.end) == "function")
 				fun.end();
@@ -711,6 +787,13 @@ var road = function road()
 			if(typeof(fun.ok) == "function")
 				fun.ok();
 
+			// Observe
+			runAsync(obs().execute, [{ 
+										action: 'Clean Removed', 
+										obj: {}, 
+										cuid: null
+									}]);
+			
 			// End Callback
 			if(typeof(fun.end) == "function")
 				fun.end();
@@ -761,10 +844,14 @@ var road = function road()
 			// Check if a cuid was passed
 			validateCUID(cuid);
 
+			
 			// Check if a cuid was not passed
 			if (lengthRemoved() == 0)
 				throw 'No data in memory';
 
+			// Get Item that will be destroyed
+			var objDestroyed = getRemovedByCUID(cuid);
+			
 			// Get the index of the item to delete
 			var removeIndex = dataRemoved.map(function(dataRemoved) 
 											  { return dataRemoved.cuid; })
@@ -781,8 +868,14 @@ var road = function road()
 
 			// Ok Callback
 			if(typeof(fun.ok) == "function")
-				fun.ok(removeIndex);
+				fun.ok(objDestroyed);
 
+			// Observe
+			runAsync(obs().execute, [{ 
+										action: 'Destroyed', 
+										obj: $.extend({}, objDestroyed), 
+										cuid: objDestroyed.cuid 
+									}]);
 			// End Callback
 			if(typeof(fun.end) == "function")
 				fun.end();
@@ -827,6 +920,13 @@ var road = function road()
 			if(typeof(fun.ok) == "function")
 				fun.ok(objRecover);
 
+			// Observe
+			runAsync(obs().execute, [{ 
+										action: 'Recovered', 
+										obj: $.extend({}, objRecover), 
+										cuid: objRecover.cuid 
+									}]);
+			
 			// End Callback
 			if(typeof(fun.end) == "function")
 				fun.end();
@@ -859,8 +959,16 @@ var road = function road()
 					fun.ok(dataRemoved[i]);
 			}
 
+			// Observe
+			runAsync(obs().execute, [{ 
+										action: 'Recovered All', 
+										obj: $.extend({}, dataRemoved), 
+										cuid: null 
+									}]);
+			
 			// Clean the Removed list
 			cleanRemoved();
+
 
 			// End Callback
 			if(typeof(fun.end) == "function")
@@ -1444,7 +1552,7 @@ var road = function road()
 	performance: function performance(fn) {
 		var start =+ new Date();
 		fn();
-		var end =+ new Date();  // log end timestamp
+		var end =  +new Date();  // log end timestamp
 		return end - start;
 	}
 	
@@ -1491,8 +1599,8 @@ var road = function road()
 		serverSendFilter: serverSendFilter,
 		serverSendByCUID: serverSendByCUID,
 		
-		performance: performance
-		
+		performance: performance,
+		observe: obs()
 	};
 	
 };

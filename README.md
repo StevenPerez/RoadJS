@@ -51,6 +51,34 @@ Every time you add or load an object via <strong>roadjs methods</strong> to the 
 </ul>
 
 <br />
+<h3>Road Observe</h3>
+<h6>Observe Async when an item is: Added, Updated, Deleted, Removed, Destroyed, Recovered, Set Data, Clean Removed</h6>
+`It returns: { action, obj, cuid }`
+<br />
+```javascript
+// Callback observable function
+function observe(param){
+   console.log(param.action + ' - ' + JSON.stringify(param.obj) + ' - cuid ' + param.cuid);
+}
+
+// Set the callback function
+people.observe.setObservable(observe);
+
+// Add
+people.add({name: 'Steven', age: 28});
+// Observe's callback
+// Added - {"name":"Steven","age":28,"cuid":"ci474ohxh000a325bna63xowt","status":"new"} - cuid ci474ohxh000a325bna63xowt
+
+// Remove
+people.remove('ci474ohxh000a325bna63xowt');
+// Observe's callback
+// Removed - {"name":"Steven","age":28,"cuid":"ci474ohxh000a325bna63xowt","status":"removed"} - cuid ci474ohxh000a325bna63xowt
+
+// and so on ...
+
+```
+
+<br />
 <h3>Road Methods</h3>
 
 ```javascript

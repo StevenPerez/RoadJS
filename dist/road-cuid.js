@@ -109,61 +109,25 @@
 
 }(this.applitude || this));
 
+/*======================================================================================
+
+					|  __ \ / __ \   /\   |  __ \       | |/ ____|
+					| |__) | |  | | /  \  | |  | |      | | (___  
+					|  _  /| |  | |/ /\ \ | |  | |  _   | |\___ \ 
+					| | \ \| |__| / ____ \| |__| | | |__| |____) |
+					|_|  \_\\____/_/    \_\_____/   \____/|_____/ 
+
+*///====================================================================================
 
 var road = function road()
 {
 	var data = [];				// Object container of the information
 	var dataRemoved = [];		// Object container of the information
-		
-	// Update the Destination property's values base on the Source
-	// when key properties match
-	function updateProperties(Source, Destination)
-	{
-		try {
-			
-			for (var key in Source) {
-
-				if(Destination.hasOwnProperty(key)){
-					Destination[key] = Source[key];
-				}
-				
-			}
-		}
-		catch (err)
-		{ throw err; }
-			
-	}
 	
-	// Validate if CID is passed correctly as parameter
-	function validateCUID(cuid) {
-		// Check if a cuid was passed
-		if (cuid)
-		{
-			if (typeof(cuid) == 'number')
-				throw 'cuid value should be String';
-		}
-		else
-			throw 'Missing cuid';
-	}
 	
-	// Extend Array to get Unique values
-	Array.prototype.distinct = function() {
-	  var b = [this[0]], i, j, tmp;
-	  for (i = 1; i < this.length; i++) {
-		tmp = 1;
-		for (j = 0; j < b.length; j++) {
-		  if (this[i] == b[j]) {
-			tmp = 0;
-			break;
-		  }
-		}
-		if (tmp) {
-		  b.push(this[i]);
-		}
-	  }
-	  return b;
-	}
+	//-----------------------> OBJECT DELEGATION <--------------------------------
 	
+	// Get unique values from Array of Objects
 	Array.prototype.unique = function() {
 		
 		var newArray = JSON.stringify(this);
@@ -182,10 +146,32 @@ var road = function road()
 
 		return newArray;
 	}
-	
+
+	// Get distinct values for flat Array
+	Array.prototype.distinct = function() {
+
+	  var b = [this[0]], i, j, tmp;
+	  for (i = 1; i < this.length; i++) {
+		tmp = 1;
+		for (j = 0; j < b.length; j++) {
+		  if (this[i] == b[j]) {
+			tmp = 0;
+			break;
+		  }
+		}
+		if (tmp) {
+		  b.push(this[i]);
+		}
+	  }
+	  return b;
+	}
+
+	// Allow to run async functions
 	window.runAsync = function(fn, arguments, callback, ms){
-			// Save Params
+			
+			// Save Params in an Object
 			var run = { fn: fn, arguments: arguments, callback: callback };
+		
 			// Execute Async
 			setTimeout(function asyncF(){
 				run.callback = run.callback || function () {};
@@ -193,12 +179,48 @@ var road = function road()
 			}, (ms == undefined) ? 0 : ms);
 	}
 	
-	return {
-		
-		// 						>>> Memory Methods <<<
-		
-		// >> Not Removed Items
-		add: function add(obj, fun, status) {
+	// ==========================================================================
+	
+	//-----------------------> PRIVATE FUNCTIONS <-------------------------------
+	
+	// Update the Destination property's values base on the Source
+	// when key properties match
+	updateProperties : function updateProperties(Source, Destination) {
+		try {
+			
+			for (var key in Source) {
+
+				if(Destination.hasOwnProperty(key)){
+					Destination[key] = Source[key];
+				}
+				
+			}
+		}
+		catch (err)
+		{ throw err; }
+			
+	}
+	
+	// Validate if CID is passed correctly as parameter
+	validateCUID: function validateCUID(cuid) {
+		// Check if a cuid was passed
+		if (cuid)
+		{
+			if (typeof(cuid) == 'number')
+				throw 'cuid value should be String';
+		}
+		else
+			throw 'Missing cuid';
+	}
+	
+	// ==========================================================================
+
+	
+	//-----------------------> PUBLIC FUNCTIONS <--------------------------------
+	
+	// 					> Live Items <
+	
+	add: function add(obj, fun, status) {
 			try {
 				
 				// Initialize
@@ -273,9 +295,9 @@ var road = function road()
 				
 				throw err; 
 			}
-		},
-				
-		remove: function remove(cuid, fun) {
+		}
+	
+	remove: function remove(cuid, fun) {
 			try
 			{
 				// Initialize
@@ -285,7 +307,7 @@ var road = function road()
 				validateCUID(cuid);
 				
 				// Check if a cuid was not passed
-				if (this.length() == 0)
+				if (length() == 0)
 					throw 'No data in memory';
 				
 				// Get the index of the item to delete
@@ -297,7 +319,7 @@ var road = function road()
 				if (removeIndex >= 0) 
 				{					
 					// Add the Clone to dataRemoved
-					var objRemoved = this.getByCUID(cuid);
+					var objRemoved = getByCUID(cuid);
 					objRemoved.status = 'removed';
 					
 					dataRemoved.push(objRemoved);
@@ -324,9 +346,9 @@ var road = function road()
 				
 				throw err; 
 			}
-		},
-		
-		update: function update(obj, cuid, fun) {
+		}
+	
+	update: function update(obj, cuid, fun) {
 			try {
 				
 				// Initialize
@@ -359,7 +381,7 @@ var road = function road()
 						if (!obj[i].cuid)
 							throw 'For array updates it is required the cuid property on each object.';
 						// Get the object from Data by cuid
-						var objData = this.getByCUID(obj[i].cuid, false);
+						var objData = getByCUID(obj[i].cuid, false);
 						
 						// Validate if item was found
 						if (objData == undefined)
@@ -384,7 +406,7 @@ var road = function road()
 						cuid = cuid || obj.cuid;
 					
 					// Get the object from Data by cuid
-					var objData = this.getByCUID(cuid.toString(), false);
+					var objData = getByCUID(cuid.toString(), false);
 					
 					// Validate if item was found
 					if (objData == undefined)
@@ -415,9 +437,9 @@ var road = function road()
 				
 				throw err; 
 			}
-		},
-		
-		delete: function del(cuid, fun) {
+		}
+	
+	del: function del(cuid, fun) {
 			try {
 
 				// Initialize
@@ -426,7 +448,7 @@ var road = function road()
 				validateCUID(cuid);
 
 				// Get Object to change status as deleted
-				var obj = this.getByCUID(cuid, false);
+				var obj = getByCUID(cuid, false);
 				
 				// Validate if item was found
 				if (obj == undefined || obj == [])
@@ -452,1091 +474,1136 @@ var road = function road()
 				
 				throw err; 
 			}
-		},
+		}
 		
-		setData: function setData(newData, fun) {
-			try
+	setData: function setData(newData, fun) {
+		try
+		{
+			// Initialize
+			fun = fun || {};
+
+			data = [];
+			data = add(newData, { sendBack: true}, 'origin');
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(data);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	getAll: function getAll(fun) {
+		try {
+
+			// Initialize
+			fun = fun || {};
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(data);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return data;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	getByCUID: function getByCUID(cuid, isClone, fun) {
+		try
+		{
+			// Initialize
+			fun = fun || {};
+
+			// If it is undefined then create a Clone of the
+			// returned object
+			if (isClone == undefined) { isClone = true; }
+
+			// Check if a cuid was passed
+			validateCUID(cuid);
+
+			// Filter Items
+			var result = data.filter(function(item) 
+									 { return item.cuid == cuid; }
+							  )[0];
+
+			if (!result)
+				throw 'No item found for cuid ' + cuid;
+
+			if (isClone)
 			{
-				// Initialize
-				fun = fun || {};
-				
-				data = [];
-				data = this.add(newData, { sendBack: true}, 'origin');
-				
+				var Clone = {};
+				$.extend(Clone, result);
+
 				// Ok Callback
 				if(typeof(fun.ok) == "function")
-					fun.ok(data);
+					fun.ok(Clone);
 
 				// End Callback
 				if(typeof(fun.end) == "function")
 					fun.end();
+
+				return Clone;
 			}
-			catch (err)
+			else
 			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		getAll: function getAll(fun) {
-			try {
-				
-				// Initialize
-				fun = fun || {};
-				
 				// Ok Callback
 				if(typeof(fun.ok) == "function")
-					fun.ok(data);
+					fun.ok(result);
 
 				// End Callback
 				if(typeof(fun.end) == "function")
 					fun.end();
-				
-				return data;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		getByCUID: function getByCUID(cuid, isClone, fun) {
-			try
-			{
-				// Initialize
-				fun = fun || {};
-				
-				// If it is undefined then create a Clone of the
-				// returned object
-				if (isClone == undefined) { isClone = true; }
-				
-				// Check if a cuid was passed
-				validateCUID(cuid);
-				
-				// Filter Items
-				var result = data.filter(function(item) 
-										 { return item.cuid == cuid; }
-								  )[0];
-				
-				if (!result)
-					throw 'No item found for cuid ' + cuid;
-				
-				if (isClone)
-				{
-					var Clone = {};
-					$.extend(Clone, result);
-					
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok(Clone);
-					
-					// End Callback
-					if(typeof(fun.end) == "function")
-						fun.end();
-					
-					return Clone;
-				}
-				else
-				{
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok(result);
-				
-					// End Callback
-					if(typeof(fun.end) == "function")
-						fun.end();
-					
-					return result;
-				}
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		length: function length(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(data.length);
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				return data.length;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		filter: function filter(criteria, fun) {
-			try {
-				
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, data);
-				
-				// Find items
-				dataClone.forEach(function (item) {
-					if (criteria(item))
-					{
-						// Ok Callback
-						if(typeof(fun.ok) == "function")
-							fun.ok(item);
-						
-						result.push(item);
-					}
-				});
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end(result);
-				
+
 				return result;
 			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	length: function length(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(data.length);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return data.length;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	filter: function filter(criteria, fun) {
+		try {
+
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, data);
+
+			// Find items
+			dataClone.forEach(function (item) {
+				if (criteria(item))
+				{
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(item);
+
+					result.push(item);
+				}
+			});
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end(result);
+
+			return result;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	map: function map(criteria, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, data);
+
+			// New object mapped
+			var newObj = dataClone.map(criteria);
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(newObj);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return newObj;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	uniqueProp: function uniqueProp(property, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			if (property == undefined)
+				throw 'Missing property name.';
+
+			if (typeof(property) != 'string' || property.length == 0)
+				throw 'Property name should be String';
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, data);
+
+			// Create new unique object
+			var newObj = dataClone.map(function (x) { return x[property] }).distinct();
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(newObj);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return newObj;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	// 					> Removed Items <
 		
-		map: function map(criteria, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, data);
-			
-				// New object mapped
-				var newObj = dataClone.map(criteria);
-				
+	getAllRemoved: function getAllRemoved(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(dataRemoved);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return dataRemoved;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	getRemovedByCUID: function getRemovedByCUID(cuid, isClone, fun) {
+		try	
+		{	
+			// Initialize
+			fun = fun || {};
+
+			// If it is undefined then create a Clone of the
+			// returned object
+			if (isClone == undefined) { isClone = true; }
+
+			// Check if a cuid was passed
+			validateCUID(cuid);
+
+			// Filter Items
+			var result = dataRemoved.filter(function(item) 
+										{ return item.cuid == cuid; }
+									 )[0];
+
+			if (!result)
+				throw 'No item found for cuid ' + cuid;
+
+			if (isClone)
+			{
+				var Clone = {};
+				$.extend(Clone, result);
+
 				// Ok Callback
 				if(typeof(fun.ok) == "function")
-					fun.ok(newObj);
-				
+					fun.ok(Clone);
+
 				// End Callback
 				if(typeof(fun.end) == "function")
 					fun.end();
-				
-				return newObj;
+
+				return Clone;
 			}
-			catch (err)
+			else
 			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		uniqueProp: function uniqueProp(property, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				if (property == undefined)
-					throw 'Missing property name.';
-				
-				if (typeof(property) != 'string' || property.length == 0)
-					throw 'Property name should be String';
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, data);
-				
-				// Create new unique object
-				var newObj = dataClone.map(function (x) { return x[property] }).distinct();
-				
 				// Ok Callback
 				if(typeof(fun.ok) == "function")
-					fun.ok(newObj);
-				
+					fun.ok(result);
+
 				// End Callback
 				if(typeof(fun.end) == "function")
 					fun.end();
-				
-				return newObj;
+
+				return result;
 			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// >> Removed Items
-		getAllRemoved: function getAllRemoved(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(dataRemoved);
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				return dataRemoved;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		getRemovedByCUID: function getRemovedByCUID(cuid, isClone, fun) {
-			try	
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	cleanRemoved: function cleanRemoved(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok();
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			dataRemoved = [];
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	lengthRemoved: function lengthRemoved(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(dataRemoved.length);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return dataRemoved.length;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	destroyRemovedByCUID: function destroyRemovedByCUID(cuid, fun) {
+		try
+		{
+			// Initialize
+			fun = fun || {};
+
+			// Check if a cuid was passed
+			validateCUID(cuid);
+
+			// Check if a cuid was not passed
+			if (lengthRemoved() == 0)
+				throw 'No data in memory';
+
+			// Get the index of the item to delete
+			var removeIndex = dataRemoved.map(function(dataRemoved) 
+											  { return dataRemoved.cuid; })
+										 .indexOf(cuid);
+
+			// If an object was found
+			if (removeIndex >= 0) 
 			{	
-				// Initialize
-				fun = fun || {};
-				
-				// If it is undefined then create a Clone of the
-				// returned object
-				if (isClone == undefined) { isClone = true; }
-
-				// Check if a cuid was passed
-				validateCUID(cuid);
-
-				// Filter Items
-				var result = dataRemoved.filter(function(item) 
-											{ return item.cuid == cuid; }
-										 )[0];
-
-				if (!result)
-					throw 'No item found for cuid ' + cuid;
-
-				if (isClone)
-				{
-					var Clone = {};
-					$.extend(Clone, result);
-
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok(Clone);
-
-					// End Callback
-					if(typeof(fun.end) == "function")
-						fun.end();
-					
-					return Clone;
-				}
-				else
-				{
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok(result);
-
-					// End Callback
-					if(typeof(fun.end) == "function")
-						fun.end();
-					
-					return result;
-				}
+				// Remove the Item
+				dataRemoved.splice(removeIndex, 1);
 			}
-			catch (err)
+			else
+				return null;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(removeIndex);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	recoverRemovedByCUID: function recoverRemovedByCUID(cuid, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Check if a cuid was passed
+			validateCUID(cuid);
+
+			// Check if a cuid was not passed
+			if (lengthRemoved() == 0)
+				throw 'No data in memory';
+
+			// Get the item to recover from the removed list
+			var objRecover = getRemovedByCUID(cuid);
+
+			// Check if the item was found
+			if (!objRecover)
+				throw 'No item found for cuid ' + cuid.toString();
+
+			// Add the item to the Non removed list
+			add(objRecover, null, 'recovered');
+
+			// Remove item from the Removed list
+			destroyRemovedByCUID(cuid);
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(objRecover);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	recoverAllRemoved: function recoverAllRemoved(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			// Check if a cuid was not passed
+			if (lengthRemoved() == 0)
+				throw 'No data in memory';
+
+			for (var i = 0; i < lengthRemoved(); i++)
 			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
+				add(dataRemoved[i], null, 'recovered');
+
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok(dataRemoved[i]);
 			}
-		},
-		
-		cleanRemoved: function cleanRemoved(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
+
+			// Clean the Removed list
+			cleanRemoved();
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	filterRemoved: function filterRemoved(criteria, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, dataRemoved);
+
+			// Find items
+			dataClone.forEach(function (item) {
+				if (criteria(item))
+				{
+					// Ok Callback
+					if(typeof(fun.ok) == "function")
+						fun.ok(item);
+
+					result.push(item);
+				}
+			});
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end(result);
+
+			return result;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	mapRemoved: function mapRemoved(criteria, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, dataRemoved);
+
+			var newObj = dataClone.map(criteria);
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(newObj);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return newObj;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	uniquePropRemoved: function uniquePropRemoved(property, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var result = [];
+
+			if (property == undefined)
+				throw 'Missing property name.';
+
+			if (typeof(property) != 'string' || property.length == 0)
+				throw 'Property name should be String';
+
+			// Create a clone in case of bad request
+			var dataClone = [];
+			$.extend(dataClone, dataRemoved);
+
+			// New unique object
+			var newObj = dataClone.map(function (x) { return x[property] }).distinct();
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(newObj);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			return newObj;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	// 				> Local Storage <
+
+	isLocalStorageSupported: function isLocalStorageSupported() {
+		try {
+			return 'localStorage' in window && window['localStorage'] !== null;
+		} 
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	saveLocalStorage: function saveLocalStorage(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			if (isLocalStorageSupported())
+			{
+				localStorage['live'] = JSON.stringify(data);
+				localStorage['removed'] = JSON.stringify(dataRemoved);
+
 				// Ok Callback
 				if(typeof(fun.ok) == "function")
 					fun.ok();
+			}
+			else
+				throw 'No local storage supported.'
 
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				dataRemoved = [];
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		lengthRemoved: function lengthRemoved(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(dataRemoved.length);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				return dataRemoved.length;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		destroyRemovedByCUID: function destroyRemovedByCUID(cuid, fun) {
-			try
-			{
-				// Initialize
-				fun = fun || {};
-				
-				// Check if a cuid was passed
-				validateCUID(cuid);
-				
-				// Check if a cuid was not passed
-				if (this.lengthRemoved() == 0)
-					throw 'No data in memory';
-				
-				// Get the index of the item to delete
-				var removeIndex = dataRemoved.map(function(dataRemoved) 
-												  { return dataRemoved.cuid; })
-											 .indexOf(cuid);
-				
-				// If an object was found
-				if (removeIndex >= 0) 
-				{	
-					// Remove the Item
-					dataRemoved.splice(removeIndex, 1);
-				}
-				else
-					return null;
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(removeIndex);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		recoverRemovedByCUID: function recoverRemovedByCUID(cuid, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				// Check if a cuid was passed
-				validateCUID(cuid);
-				
-				// Check if a cuid was not passed
-				if (this.lengthRemoved() == 0)
-					throw 'No data in memory';
-				
-				// Get the item to recover from the removed list
-				var objRecover = this.getRemovedByCUID(cuid);
-				
-				// Check if the item was found
-				if (!objRecover)
-					throw 'No item found for cuid ' + cuid.toString();
-				
-				// Add the item to the Non removed list
-				this.add(objRecover, null, 'recovered');
-				
-				// Remove item from the Removed list
-				this.destroyRemovedByCUID(cuid);
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(objRecover);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		recoverAllRemoved: function recoverAllRemoved(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				// Check if a cuid was not passed
-				if (this.lengthRemoved() == 0)
-					throw 'No data in memory';
-
-				for (var i = 0; i < this.lengthRemoved(); i++)
-				{
-					this.add(dataRemoved[i], null, 'recovered');
-					
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok(dataRemoved[i]);
-				}
-				
-				// Clean the Removed list
-				this.cleanRemoved();
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		filterRemoved: function filterRemoved(criteria, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, dataRemoved);
-				
-				// Find items
-				dataClone.forEach(function (item) {
-					if (criteria(item))
-					{
-						// Ok Callback
-						if(typeof(fun.ok) == "function")
-							fun.ok(item);
-						
-						result.push(item);
-					}
-				});
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end(result);
-				
-				return result;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		mapRemoved: function mapRemoved(criteria, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, dataRemoved);
-				
-				var newObj = dataClone.map(criteria);
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(newObj);
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				return newObj;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		uniquePropRemoved: function uniquePropRemoved(property, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var result = [];
-				
-				if (property == undefined)
-					throw 'Missing property name.';
-				
-				if (typeof(property) != 'string' || property.length == 0)
-					throw 'Property name should be String';
-				
-				// Create a clone in case of bad request
-				var dataClone = [];
-				$.extend(dataClone, dataRemoved);
-				
-				// New unique object
-				var newObj = dataClone.map(function (x) { return x[property] }).distinct();
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(newObj);
-				
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				return newObj;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// 				>>> Local Storage <<<
-		
-		// Check if Local Storage is Supported
-		isLocalStorageSupported: function isLocalStorageSupported() {
-			try {
-				return 'localStorage' in window && window['localStorage'] !== null;
-			} 
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// Save in Local Storage
-		saveLocalStorage: function saveLocalStorage(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				if (this.isLocalStorageSupported())
-				{
-					localStorage['live'] = JSON.stringify(data);
-					localStorage['removed'] = JSON.stringify(dataRemoved);
-					
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok();
-				}
-				else
-					throw 'No local storage supported.'
-					
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// Load from Local Storage
-		loadLocalStorage: function loadLocalStorage(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				if (this.isLocalStorageSupported())
-				{
-					data = [];
-					dataRemoved = [];
-					
-					data = JSON.parse(localStorage['live']);
-					dataRemoved = JSON.parse(localStorage['removed']);
-					
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok();
-				}
-				else
-					throw 'No local storage supported.'
-					
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// Clean Local Storage
-		cleanLocalStorage: function cleanLocalStorage(fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				if (this.isLocalStorageSupported())
-				{
-					localStorage['live'] = null;
-					localStorage['removed'] = null;
-					
-					// Ok Callback
-					if(typeof(fun.ok) == "function")
-						fun.ok();
-				}
-				else
-					throw 'No local storage supported.'
-					
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// 				>>> Ajax Requests <<<
-		
-		// Load data through non-async request
-		serverLoad: function serverLoad(ajaxUrl, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				// Set not async load
-				ajaxParams.async = false;
-				ajaxParams.method = 'GET';
-				ajaxParams.url = ajaxUrl;
-				
-				// Initialize Data
-				data = [];
-				
-				// Send Ajax Request
-				var dataAnalysis = $.ajax(ajaxParams).responseText;
-				
-				// If it is JSON convert to JS Array
-				if (typeof(dataAnalysis) == 'string')
-					dataAnalysis = JSON.parse(dataAnalysis);
-				
-				// If there is data then Add to data
-				if (dataAnalysis) {	
-					this.add(dataAnalysis, {}, 'origin');
-				}
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(dataAnalysis);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		serverSendAll: function serverSendAll(ajaxUrl, isJSON, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Initialize isJSON
-				if (isJSON == undefined) { isJSON = false; }
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				if (!data || data == [])
-					throw 'No data found.';
-					
-				// -----------------------------------------------------------
-				
-				if (isJSON == false)
-					ajaxParams.data = { 'data': data };
-				else
-					ajaxParams.data = JSON.stringify(data);
-				
-				ajaxParams.async = false;
-				ajaxParams.method = 'POST';
-				ajaxParams.url = ajaxUrl;
-				
-				// Send and Get Ajax Response
-				var reponseAjax = $.ajax(ajaxParams).responseText;
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(reponseAjax);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				// If it is JSON convert to JS Array
-				return reponseAjax;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		serverSendAllMap: function serverSendAll(ajaxUrl, criteria, isJSON, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Initialize isJSON
-				if (isJSON == undefined) { isJSON = false; }
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				if (!data || data == [] && !dataRemoved || dataRemoved == [])
-					throw 'No data found.';
-					
-				// -----------------------------------------------------------
-				
-				var objFiltered = [];
-				
-				this.filter(criteria).forEach( function(item){ objFiltered.push(item); });
-				this.filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
-				
-				// -----------------------------------------------------------
-				
-				if (isJSON == false)
-					ajaxParams.data = { 'data': objFiltered.map(criteria) };
-				else
-					ajaxParams.data = JSON.stringify(objFiltered.map(criteria));
-				
-				ajaxParams.async = false;
-				ajaxParams.method = 'POST';
-				ajaxParams.url = ajaxUrl;
-				
-				// Send and Get Ajax Response
-				var reponseAjax = $.ajax(ajaxParams).responseText;
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(reponseAjax);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				// If it is JSON convert to JS Array
-				return reponseAjax;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		serverSendAllRemoved: function serverSendAllRemoved(ajaxUrl, isJSON, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Initialize isJSON
-				if (isJSON == undefined) { isJSON = false; }
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				if (!dataRemoved || dataRemoved == [])
-					throw 'No data found.';
-					
-				// -----------------------------------------------------------
-				
-				if (isJSON == false)
-					ajaxParams.data = { 'data': dataRemoved };
-				else
-					ajaxParams.data = JSON.stringify(dataRemoved);
-				
-				ajaxParams.async = false;
-				ajaxParams.method = 'POST';
-				ajaxParams.url = ajaxUrl;
-				
-				// Send and Get Ajax Response
-				var reponseAjax = $.ajax(ajaxParams).responseText;
-
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(reponseAjax);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				// If it is JSON convert to JS Array
-				return reponseAjax;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		serverSendFilter: function serverSendFilter(ajaxUrl, criteria, isJSON, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Initialize isJSON
-				if (isJSON == undefined) { isJSON = false; }
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				// Validate there are params
-				if (!criteria)
-					throw 'Missing filter criteria parameter';
-				
-				if (!data || data == [] && !dataRemoved || dataRemoved == [])
-					throw 'No data found.';
-					
-				// -----------------------------------------------------------
-				
-				var objFiltered = [];
-				
-				this.filter(criteria).forEach( function(item){ objFiltered.push(item); });
-				this.filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
-				
-				if (isJSON == false)
-					ajaxParams.data = { 'data': objFiltered };
-				else
-					ajaxParams.data = JSON.stringify(objFiltered);
-				
-				ajaxParams.async = false;
-				ajaxParams.method = 'POST';
-				ajaxParams.url = ajaxUrl;
-				
-				// Send and Get Ajax Response
-				var reponseAjax = $.ajax(ajaxParams).responseText;
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(reponseAjax);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end();
-				
-				// If it is JSON convert to JS Array
-				return reponseAjax;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		serverSendByCUID: function serverSendByCUID(cuid, ajaxUrl, isJSON, fun) {
-			try {
-				// Initialize
-				fun = fun || {};
-				
-				var ajaxParams = {};
-				
-				// Check if a cuid was passed
-				validateCUID(cuid);
-				
-				// Initialize isJSON
-				if (isJSON == undefined) { isJSON = false; }
-				
-				// Validate there are params
-				if (!ajaxUrl)
-					throw 'Missing ajax url parameter';
-				
-				// Initialize Data
-				var objToSend = this.getByCUID(cuid);
-				
-				if (!objToSend) 
-					objToSend = this.getRemovedByCUID(cuid);
-				
-				if (typeof(objToSend) == 'string')
-					throw 'No item found for cuid ' + cuid;
-			
-				// -----------------------------------------------------------
-				
-				if (isJSON == false)
-					ajaxParams.data = objToSend;
-				else
-					ajaxParams.data = JSON.stringify(objToSend);
-				
-				ajaxParams.async = false;
-				ajaxParams.method = 'POST';
-				ajaxParams.url = ajaxUrl;
-				
-				// Send and Get Ajax Response
-				var reponseAjax = $.ajax(ajaxParams).responseText;
-				
-				// Ok Callback
-				if(typeof(fun.ok) == "function")
-					fun.ok(objToSend, reponseAjax);
-
-				// End Callback
-				if(typeof(fun.end) == "function")
-					fun.end(reponseAjax);
-				
-				// If it is JSON convert to JS Array
-				return reponseAjax;
-			}
-			catch (err)
-			{
-				// ERROR Callback
-				if(typeof(fun.err) == "function")
-					fun.err(err);
-				
-				throw err; 
-			}
-		},
-		
-		// 				>>> Test Performance <<<
-		performance: function performance(fn)
-		{
-			var start =+ new Date();
-			fn();
-			var end =  +new Date();  // log end timestamp
-	 		return end - start;
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
 		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	loadLocalStorage: function loadLocalStorage(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			if (isLocalStorageSupported())
+			{
+				data = [];
+				dataRemoved = [];
+
+				data = JSON.parse(localStorage['live']);
+				dataRemoved = JSON.parse(localStorage['removed']);
+
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok();
+			}
+			else
+				throw 'No local storage supported.'
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	cleanLocalStorage: function cleanLocalStorage(fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			if (isLocalStorageSupported())
+			{
+				localStorage['live'] = null;
+				localStorage['removed'] = null;
+
+				// Ok Callback
+				if(typeof(fun.ok) == "function")
+					fun.ok();
+			}
+			else
+				throw 'No local storage supported.'
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	// 				>>> Ajax Requests <<<
+
+	serverLoad: function serverLoad(ajaxUrl, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			// Set not async load
+			ajaxParams.async = false;
+			ajaxParams.method = 'GET';
+			ajaxParams.url = ajaxUrl;
+
+			// Initialize Data
+			data = [];
+
+			// Send Ajax Request
+			var dataAnalysis = $.ajax(ajaxParams).responseText;
+
+			// If it is JSON convert to JS Array
+			if (typeof(dataAnalysis) == 'string')
+				dataAnalysis = JSON.parse(dataAnalysis);
+
+			// If there is data then Add to data
+			if (dataAnalysis) {	
+				add(dataAnalysis, {}, 'origin');
+			}
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(dataAnalysis);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	serverSendAll: function serverSendAll(ajaxUrl, isJSON, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Initialize isJSON
+			if (isJSON == undefined) { isJSON = false; }
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			if (!data || data == [])
+				throw 'No data found.';
+
+			// -----------------------------------------------------------
+
+			if (isJSON == false)
+				ajaxParams.data = { 'data': data };
+			else
+				ajaxParams.data = JSON.stringify(data);
+
+			ajaxParams.async = false;
+			ajaxParams.method = 'POST';
+			ajaxParams.url = ajaxUrl;
+
+			// Send and Get Ajax Response
+			var reponseAjax = $.ajax(ajaxParams).responseText;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(reponseAjax);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			// If it is JSON convert to JS Array
+			return reponseAjax;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	serverSendAllMap: function serverSendAllMap(ajaxUrl, criteria, isJSON, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Initialize isJSON
+			if (isJSON == undefined) { isJSON = false; }
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			if (!data || data == [] && !dataRemoved || dataRemoved == [])
+				throw 'No data found.';
+
+			// -----------------------------------------------------------
+
+			var objFiltered = [];
+
+			filter(criteria).forEach( function(item){ objFiltered.push(item); });
+			filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
+
+			// -----------------------------------------------------------
+
+			if (isJSON == false)
+				ajaxParams.data = { 'data': objFiltered.map(criteria) };
+			else
+				ajaxParams.data = JSON.stringify(objFiltered.map(criteria));
+
+			ajaxParams.async = false;
+			ajaxParams.method = 'POST';
+			ajaxParams.url = ajaxUrl;
+
+			// Send and Get Ajax Response
+			var reponseAjax = $.ajax(ajaxParams).responseText;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(reponseAjax);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			// If it is JSON convert to JS Array
+			return reponseAjax;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	serverSendAllRemoved: function serverSendAllRemoved(ajaxUrl, isJSON, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Initialize isJSON
+			if (isJSON == undefined) { isJSON = false; }
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			if (!dataRemoved || dataRemoved == [])
+				throw 'No data found.';
+
+			// -----------------------------------------------------------
+
+			if (isJSON == false)
+				ajaxParams.data = { 'data': dataRemoved };
+			else
+				ajaxParams.data = JSON.stringify(dataRemoved);
+
+			ajaxParams.async = false;
+			ajaxParams.method = 'POST';
+			ajaxParams.url = ajaxUrl;
+
+			// Send and Get Ajax Response
+			var reponseAjax = $.ajax(ajaxParams).responseText;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(reponseAjax);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			// If it is JSON convert to JS Array
+			return reponseAjax;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	serverSendFilter: function serverSendFilter(ajaxUrl, criteria, isJSON, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Initialize isJSON
+			if (isJSON == undefined) { isJSON = false; }
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			// Validate there are params
+			if (!criteria)
+				throw 'Missing filter criteria parameter';
+
+			if (!data || data == [] && !dataRemoved || dataRemoved == [])
+				throw 'No data found.';
+
+			// -----------------------------------------------------------
+
+			var objFiltered = [];
+
+			filter(criteria).forEach( function(item){ objFiltered.push(item); });
+			filterRemoved(criteria).forEach( function(item) { objFiltered.push(item); });
+
+			if (isJSON == false)
+				ajaxParams.data = { 'data': objFiltered };
+			else
+				ajaxParams.data = JSON.stringify(objFiltered);
+
+			ajaxParams.async = false;
+			ajaxParams.method = 'POST';
+			ajaxParams.url = ajaxUrl;
+
+			// Send and Get Ajax Response
+			var reponseAjax = $.ajax(ajaxParams).responseText;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(reponseAjax);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end();
+
+			// If it is JSON convert to JS Array
+			return reponseAjax;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	serverSendByCUID: function serverSendByCUID(cuid, ajaxUrl, isJSON, fun) {
+		try {
+			// Initialize
+			fun = fun || {};
+
+			var ajaxParams = {};
+
+			// Check if a cuid was passed
+			validateCUID(cuid);
+
+			// Initialize isJSON
+			if (isJSON == undefined) { isJSON = false; }
+
+			// Validate there are params
+			if (!ajaxUrl)
+				throw 'Missing ajax url parameter';
+
+			// Initialize Data
+			var objToSend = '';
+			try { 
+				objToSend = getByCUID(cuid); 
+			}
+		 	catch(err) { 
+				objToSend = getRemovedByCUID(cuid); 
+			}
+
+			if (typeof(objToSend) == 'string')
+				throw 'No item found for cuid ' + cuid;
+
+			// -----------------------------------------------------------
+
+			if (isJSON == false)
+				ajaxParams.data = objToSend;
+			else
+				ajaxParams.data = JSON.stringify(objToSend);
+
+			ajaxParams.async = false;
+			ajaxParams.method = 'POST';
+			ajaxParams.url = ajaxUrl;
+
+			// Send and Get Ajax Response
+			var reponseAjax = $.ajax(ajaxParams).responseText;
+
+			// Ok Callback
+			if(typeof(fun.ok) == "function")
+				fun.ok(objToSend, reponseAjax);
+
+			// End Callback
+			if(typeof(fun.end) == "function")
+				fun.end(reponseAjax);
+
+			// If it is JSON convert to JS Array
+			return reponseAjax;
+		}
+		catch (err)
+		{
+			// ERROR Callback
+			if(typeof(fun.err) == "function")
+				fun.err(err);
+
+			throw err; 
+		}
+	}
+
+	// 				> Test Performance <
+	
+	performance: function performance(fn) {
+		var start =+ new Date();
+		fn();
+		var end =  +new Date();  // log end timestamp
+		return end - start;
+	}
+	
+	// ==========================================================================
+	
+	return {
+		
+		// Live Items
+		add: add,
+		remove: remove,
+		update: update,
+		delete: del,
+		setData: setData,
+		getAll: getAll,
+		getByCUID: getByCUID,
+		length: length,
+		filter: filter,
+		map: map,
+		uniqueProp: uniqueProp,
+		
+		// Removed Items
+		getAllRemoved: getAllRemoved,
+		getRemovedByCUID: getRemovedByCUID,
+		cleanRemoved: cleanRemoved,
+		lengthRemoved: lengthRemoved,
+		destroyRemovedByCUID: destroyRemovedByCUID,
+		recoverRemovedByCUID: recoverRemovedByCUID,
+		recoverAllRemoved: recoverAllRemoved,
+		filterRemoved: filterRemoved,
+		mapRemoved: mapRemoved,
+		uniquePropRemoved: uniquePropRemoved,
+		
+		// Local Storage
+		isLocalStorageSupported: isLocalStorageSupported,
+		saveLocalStorage: saveLocalStorage,
+		loadLocalStorage: loadLocalStorage,
+		cleanLocalStorage: cleanLocalStorage,
+		
+		// Server Ajax Requests
+		serverLoad: serverLoad,
+		serverSendAll: serverSendAll,
+		serverSendAllMap: serverSendAllMap,
+		serverSendAllRemoved: serverSendAllRemoved,
+		serverSendFilter: serverSendFilter,
+		serverSendByCUID: serverSendByCUID,
+		
+		performance: performance
+		
 	};
 	
 };

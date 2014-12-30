@@ -1348,7 +1348,9 @@ var road = function road()
 				dataAnalysis = JSON.parse(dataAnalysis);
 
 			// If there is data then Add to data
-			if (dataAnalysis) {	
+			if (dataAnalysis.length == 1) {	
+				add(dataAnalysis[0], {}, 'origin');
+			} else {
 				add(dataAnalysis, {}, 'origin');
 			}
 

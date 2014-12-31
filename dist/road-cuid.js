@@ -1343,6 +1343,10 @@ var road = function road()
 			// Send Ajax Request
 			var dataAnalysis = $.ajax(ajaxParams).responseText;
 
+			// Skip if empty array was returned
+			if (dataAnalysis == '[]')
+				return;
+			
 			// If it is JSON convert to JS Array
 			if (typeof(dataAnalysis) == 'string')
 				dataAnalysis = JSON.parse(dataAnalysis);
